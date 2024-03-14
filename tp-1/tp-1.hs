@@ -58,12 +58,13 @@ iguales _ _         = False
 
 -- c 
 
--- En caso de que no exista la siguiente dirección a Oeste. 
+-- En caso de que no exista la siguiente dirección a Oeste. La función tendria como precondición
+-- que la dirección no puede ser Oeste y seria parcial.
 
 siguiente :: Dir -> Dir 
 siguiente Norte = Este 
-siguiente Este = Sur 
-siguiente Sur = Oeste 
+siguiente Este  = Sur 
+siguiente Sur   = Oeste 
 siguiente Oeste = Norte 
 
 -- 2: 
@@ -107,9 +108,9 @@ vieneDespues d1 d2 = (numeroDia d1) > (numeroDia d2 )
 -- d
 
 estaEnElMedio :: DiaDeSemana -> Bool 
-estaEnElMedio Lunes = False 
+estaEnElMedio Lunes   = False 
 estaEnElMedio Domingo = False 
-estaEnElMedio _ = True 
+estaEnElMedio _       = True 
 
 -- 3:
 
