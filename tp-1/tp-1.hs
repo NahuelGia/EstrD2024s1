@@ -93,6 +93,7 @@ empiezaConM _         = False
 -- c 
 
 numeroDia :: DiaDeSemana -> Int
+
 numeroDia Lunes     = 1
 numeroDia Martes    = 2
 numeroDia Miercoles = 3
@@ -135,9 +136,8 @@ yTambien _ _       = False
 -- d 
 
 oBien :: Bool -> Bool -> Bool
-oBien True False = True 
-oBien False True = True 
-oBien _ _        = False
+oBien True _ = True 
+oBien _    b = b
 
 {- EJERCICIO 4 -}
 
