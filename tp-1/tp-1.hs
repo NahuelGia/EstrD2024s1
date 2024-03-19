@@ -130,8 +130,9 @@ implica _ _        = True
 -- c
 
 yTambien :: Bool -> Bool -> Bool 
-yTambien True True = True 
-yTambien _ _       = False 
+yTambien _     False = False 
+yTambien False _ = False
+yTambien _     _  = True
 
 -- d 
 
