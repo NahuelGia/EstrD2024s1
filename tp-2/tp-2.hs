@@ -131,3 +131,107 @@ losPrimeros :: Int -> [a] -> [a]
 losPrimeros 0 xs     = []
 losPrimeros n []     = []
 losPrimeros n (x:xs) = x : losPrimeros (n-1) xs 
+
+-- 5 
+
+sinLosPrimeros :: Int -> [a] -> [a]
+sinLosPrimeros 0 xs     = xs
+sinLosPrimeros n []     = []
+sinLosPrimeros n (x:xs) = sinLosPrimeros (n-1) xs 
+
+{- EJERCICIO 3 -}
+
+-- 1 
+
+data Persona = P String Int 
+  deriving Show
+
+edad :: Persona -> Int 
+edad (P _ e) = e
+
+hector = P "Hector" 20
+pedro  = P "Pedro"  42
+pepe   = P "Pepe"   38
+listaPersonas = [hector,pedro,pepe]
+
+-- a
+
+mayoresA :: Int -> [Persona] -> [Persona]
+mayoresA n []     = []
+mayoresA n (p:ps) = if  (edad p) > n 
+                      then p : mayoresA n ps 
+                    else mayoresA n ps 
+
+-- b
+
+sumatoriaDeEdades :: [Persona] -> Int 
+sumatoriaDeEdades []     = 0
+sumatoriaDeEdades (x:xs) = (edad x) + (sumatoriaDeEdades xs) 
+
+promedioEdad :: [Persona] -> Int 
+promedioEdad ps  = div (sumatoriaDeEdades ps) (longitud ps)  
+
+-- c
+
+elMasViejo :: [Persona] -> Persona
+elMasViejo [p]    = p 
+elMasViejo (p:ps) = if (edad p) > (edad (elMasViejo ps))
+                      then p 
+                    else elMasViejo ps 
+
+-- 2 
+
+data TipoDePokemon = Agua | Fuego | Planta
+  deriving Show
+
+data Pokemon = ConsPokemon TipoDePokemon Int
+  deriving Show 
+
+data Entrenador = ConsEntrenador String [Pokemon]
+  deriving Show 
+
+charizard  = ConsPokemon Fuego  60 
+mudkip     = ConsPokemon Agua   100
+juan       = ConsPokemon Planta 50
+entrenador = ConsEntrenador "prueba" [charizard, mudkip, juan]
+
+-- a
+
+listaPokemonDe :: Entrenador -> [Pokemon]
+listaPokemonDe (ConsEntrenador _ ps) = ps 
+
+cantPokemon :: Entrenador -> Int 
+cantPokemon e = longitud (listaPokemonDe e)
+
+-- b 
+
+unoSiCeroSino :: Bool -> Int 
+unoSiCeroSino True  = 1
+unoSiCeroSino False = 0 
+
+pokemonEsDeTipo :: Pokemon -> TipoDePokemon -> Bool 
+pokemonEsDeTipo (ConsPokemon Fuego  _ ) Fuego  = True 
+pokemonEsDeTipo (ConsPokemon Agua   _ ) Agua   = True 
+pokemonEsDeTipo (ConsPokemon Planta _ ) Planta = True 
+pokemonEsDeTipo        _           _           = False
+
+cantPokemonsDeTipoEn :: TipoDePokemon -> [Pokemon] -> Int 
+cantPokemonsDeTipoEn _ []     = 0
+cantPokemonsDeTipoEn t (p:ps) = (unoSiCeroSino (pokemonEsDeTipo p t)) + (cantPokemonsDeTipoEn t ps)
+
+cantPokemonDe :: TipoDePokemon -> Entrenador -> Int 
+cantPokemonDe t e = cantPokemonsDeTipoEn t (listaPokemonDe e)
+
+-- c 
+
+--cuantosDeTipo_De_LeGananATodosLosDe_ :: TipoDePokemon -> Entrenador -> Entrenador -> Int
+
+
+-- d
+
+hayDeTipo_En_ :: TipoDePokemon -> [Pokemon] -> Bool 
+hayDeTipo_En_  _ []     = False
+hayDeTipo_En_  t (p:ps) = (pokemonEsDeTipo p t) || (hayDeTipo_En_ t ps)
+
+esMaestroPokemon :: Entrenador -> Bool 
+esMaestroPokemon (ConsEntrenador _ ps ) = (hayDeTipo_En_ Fuego ps) && (hayDeTipo_En_ Agua ps) && (hayDeTipo_En_ Planta ps)
