@@ -235,3 +235,59 @@ hayDeTipo_En_  t (p:ps) = (pokemonEsDeTipo p t) || (hayDeTipo_En_ t ps)
 
 esMaestroPokemon :: Entrenador -> Bool 
 esMaestroPokemon (ConsEntrenador _ ps ) = (hayDeTipo_En_ Fuego ps) && (hayDeTipo_En_ Agua ps) && (hayDeTipo_En_ Planta ps)
+
+-- 3
+
+data Seniority = Junior | SemiSenior | Senior
+  deriving Show
+
+data Proyecto  = ConsProyecto String
+  deriving (Show, Eq)
+
+data Rol       = Developer Seniority Proyecto | Management Seniority Proyecto
+  deriving Show
+
+data Empresa   = ConsEmpresa [Rol]
+  deriving Show
+
+proyecto1 = ConsProyecto "proyecto1"
+proyecto2 = ConsProyecto "proyecto2"
+proyecto3 = ConsProyecto "proyecto3"
+proyecto4 = ConsProyecto "proyecto4"
+
+rol1 = Developer Junior proyecto1
+rol2 = Developer Senior proyecto2
+rol3 = Management SemiSenior proyecto4
+
+empresa1 = ConsEmpresa [rol1, rol2, rol3]
+
+-- a
+
+proyectos :: Empresa -> [Proyecto]
+proyectos (ConsEmpresa rs) = proyectosEnRoles rs
+
+proyectosEnRoles :: [Rol] -> [Proyecto]
+proyectosEnRoles []     = []
+proyectosEnRoles (r:rs) = if pertence (proyectoDeRol r) (proyectosEnRoles rs)
+                            then proyectosEnRoles rs
+                          else (proyectoDeRol r) : proyectosEnRoles rs
+
+proyectoDeRol :: Rol -> Proyecto
+proyectoDeRol (Developer  _ p) = p
+proyectoDeRol (Management _ p) = p
+
+-- b
+
+losDevSenior :: Empresa -> [Proyecto] -> Int 
+losDevSenior (ConsEmpresa rs) ps = cantDevSeniorConProyecto rs ps
+
+esDevSeniorConProyecto :: Rol -> [Proyecto] -> Bool 
+esDevSeniorConProyecto (Developer Senior p ) ps = (pertence p ps  )
+esDevSeniorConProyecto _                     _  = False
+
+cantDevSeniorConProyecto :: [Rol] -> [Proyecto] -> Int 
+cantDevSeniorConProyecto []     _  = 0
+cantDevSeniorConProyecto (r:rs) ps = (unoSiCeroSino (esDevSeniorConProyecto r ps)) + (cantDevSeniorConProyecto rs ps)
+
+-- c
+
