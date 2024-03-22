@@ -224,10 +224,41 @@ cantPokemonDe t e = cantPokemonsDeTipoEn t (listaPokemonDe e)
 
 -- c 
 
---cuantosDeTipo_De_LeGananATodosLosDe_ :: TipoDePokemon -> Entrenador -> Entrenador -> Int
+cuantosDeTipoDe_LeGananATodosLosDe :: TipoDePokemon -> Entrenador -> Entrenador -> Int
+cuantosDeTipoDe_LeGananATodosLosDe t (ConsEntrenador _ pks1) (ConsEntrenador _ pks2) = cantPokesDeTipoQueLeGananATodos t pks1 pks2
 
 
--- d
+cantPokesDeTipoQueLeGananATodos :: TipoDePokemon -> [Pokemon] -> [Pokemon] -> Int 
+cantPokesDeTipoQueLeGananATodos _  []           pks2 = 0
+cantPokesDeTipoQueLeGananATodos t  (pk1 : pks1) pks2 = if  pokemonEsDeTipo pk1 t
+
+                                                            then unoSiCeroSino (venceATodos pk1 pks2)
+                                                                 + cantPokesDeTipoQueLeGananATodos t pks1 pks2
+
+                                                          else cantPokesDeTipoQueLeGananATodos t pks1 pks2
+
+tipoDelPokemon :: Pokemon -> TipoDePokemon 
+tipoDelPokemon (ConsPokemon t _ ) = t
+
+
+venceATodos :: Pokemon -> [Pokemon] -> Bool
+venceATodos pk1  []          = True
+venceATodos pk1  (pk2: pks2) = (superaA pk1 pk2) && venceATodos pk1 pks2
+
+tipo :: Pokemon -> TipoDePokemon
+tipo (ConsPokemon t _) = t 
+
+tipoSuperaA :: TipoDePokemon -> TipoDePokemon -> Bool 
+tipoSuperaA Agua   Fuego  = True 
+tipoSuperaA Fuego  Planta = True 
+tipoSuperaA Planta Agua   = True 
+tipoSuperaA _ _           = False 
+
+superaA :: Pokemon -> Pokemon -> Bool 
+superaA p1 p2 = tipoSuperaA (tipo p1) (tipo p2)
+
+
+-- d 
 
 hayDeTipo_En_ :: TipoDePokemon -> [Pokemon] -> Bool 
 hayDeTipo_En_  _ []     = False
@@ -258,8 +289,9 @@ proyecto4 = ConsProyecto "proyecto4"
 rol1 = Developer Junior proyecto1
 rol2 = Developer Senior proyecto2
 rol3 = Management SemiSenior proyecto4
+rol4 = Management SemiSenior proyecto4
 
-empresa1 = ConsEmpresa [rol1, rol2, rol3]
+empresa1 = ConsEmpresa [rol1, rol2, rol3, rol4]
 
 -- a
 
@@ -268,13 +300,13 @@ proyectos (ConsEmpresa rs) = proyectosEnRoles rs
 
 proyectosEnRoles :: [Rol] -> [Proyecto]
 proyectosEnRoles []     = []
-proyectosEnRoles (r:rs) = if pertence (proyectoDeRol r) (proyectosEnRoles rs)
+proyectosEnRoles (r:rs) = if pertence (proyectoDelRol r) (proyectosEnRoles rs)
                             then proyectosEnRoles rs
-                          else (proyectoDeRol r) : proyectosEnRoles rs
+                          else (proyectoDelRol r) : proyectosEnRoles rs
 
-proyectoDeRol :: Rol -> Proyecto
-proyectoDeRol (Developer  _ p) = p
-proyectoDeRol (Management _ p) = p
+proyectoDelRol :: Rol -> Proyecto
+proyectoDelRol (Developer  _ p) = p
+proyectoDelRol (Management _ p) = p
 
 -- b
 
@@ -282,7 +314,7 @@ losDevSenior :: Empresa -> [Proyecto] -> Int
 losDevSenior (ConsEmpresa rs) ps = cantDevSeniorConProyecto rs ps
 
 esDevSeniorConProyecto :: Rol -> [Proyecto] -> Bool 
-esDevSeniorConProyecto (Developer Senior p ) ps = (pertence p ps  )
+esDevSeniorConProyecto (Developer Senior p ) ps = (pertence p ps)
 esDevSeniorConProyecto _                     _  = False
 
 cantDevSeniorConProyecto :: [Rol] -> [Proyecto] -> Int 
@@ -291,3 +323,25 @@ cantDevSeniorConProyecto (r:rs) ps = (unoSiCeroSino (esDevSeniorConProyecto r ps
 
 -- c
 
+cantQueTrabajanEn :: [Proyecto] -> Empresa -> Int 
+cantQueTrabajanEn pr (ConsEmpresa rs) = cantRolesConProyecto rs pr 
+
+cantRolesConProyecto :: [Rol] -> [Proyecto] -> Int 
+cantRolesConProyecto []     _  = 0
+cantRolesConProyecto (r:rs) ps = unoSiCeroSino (pertence (proyectoDelRol r) ps) + cantRolesConProyecto rs ps 
+
+-- d 
+
+asignadosPorProyecto :: Empresa -> [(Proyecto,Int)]
+asignadosPorProyecto e = cantRolesPorProyecto (listaRoles e) (proyectos e)
+
+listaRoles :: Empresa -> [Rol]
+listaRoles (ConsEmpresa rs) = rs 
+
+cantRolesPorProyecto :: [Rol] -> [Proyecto] -> [(Proyecto, Int)]
+cantRolesPorProyecto rs []     = []
+cantRolesPorProyecto rs (p:ps) = (p, rolesAsignadosEn rs p ) : cantRolesPorProyecto rs ps
+
+rolesAsignadosEn :: [Rol] -> Proyecto -> Int 
+rolesAsignadosEn []     p = 0
+rolesAsignadosEn (r:rs) p = unoSiCeroSino ( (proyectoDelRol r) == p ) + rolesAsignadosEn rs p
