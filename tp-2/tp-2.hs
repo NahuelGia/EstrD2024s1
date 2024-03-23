@@ -232,21 +232,18 @@ cantPokesDeTipoQueLeGananATodos :: TipoDePokemon -> [Pokemon] -> [Pokemon] -> In
 cantPokesDeTipoQueLeGananATodos _  []           pks2 = 0
 cantPokesDeTipoQueLeGananATodos t  (pk1 : pks1) pks2 = if  pokemonEsDeTipo pk1 t
 
-                                                            then unoSiCeroSino (venceATodos pk1 pks2)
-                                                                 + cantPokesDeTipoQueLeGananATodos t pks1 pks2
+                                                          then unoSiCeroSino (venceATodos pk1 pks2)
+                                                                + cantPokesDeTipoQueLeGananATodos t pks1 pks2
 
-                                                          else cantPokesDeTipoQueLeGananATodos t pks1 pks2
+                                                        else cantPokesDeTipoQueLeGananATodos t pks1 pks2
 
-tipoDelPokemon :: Pokemon -> TipoDePokemon 
-tipoDelPokemon (ConsPokemon t _ ) = t
+tipo :: Pokemon -> TipoDePokemon 
+tipo (ConsPokemon t _ ) = t
 
 
 venceATodos :: Pokemon -> [Pokemon] -> Bool
-venceATodos pk1  []          = True
+venceATodos p1  []          = True
 venceATodos pk1  (pk2: pks2) = (superaA pk1 pk2) && venceATodos pk1 pks2
-
-tipo :: Pokemon -> TipoDePokemon
-tipo (ConsPokemon t _) = t 
 
 tipoSuperaA :: TipoDePokemon -> TipoDePokemon -> Bool 
 tipoSuperaA Agua   Fuego  = True 
