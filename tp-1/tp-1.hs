@@ -62,10 +62,11 @@ iguales _ _         = False
 -- que la dirección no puede ser Oeste y seria parcial.
 
 siguiente :: Dir -> Dir 
+-- Precond: La dirección no puede ser Oeste 
 siguiente Norte = Este 
 siguiente Este  = Sur 
 siguiente Sur   = Oeste 
-siguiente Oeste = Norte 
+siguiente Oeste = error "Oeste no tiene siguiente" 
 
 -- 2: 
 
@@ -124,15 +125,14 @@ negar False = True
 -- b
 
 implica :: Bool -> Bool -> Bool 
-implica True False = False
-implica _ _        = True 
+implica True  b = b 
+implica False _ = True 
 
 -- c
 
 yTambien :: Bool -> Bool -> Bool 
-yTambien _     False = False 
+yTambien True  b  = b 
 yTambien False _ = False
-yTambien _     _  = True
 
 -- d 
 
@@ -220,11 +220,17 @@ unoSiCeroSino :: Bool -> Int
 unoSiCeroSino True  = 1
 unoSiCeroSino False = 0 
 
+tipoDe :: Pokemon -> TipoDePokemon
+tipoDe (Poke t _) = t 
+
 pokemonEsDeTipo :: Pokemon -> TipoDePokemon -> Bool 
-pokemonEsDeTipo (Poke Fuego  _ ) Fuego  = True 
-pokemonEsDeTipo (Poke Agua   _ ) Agua   = True 
-pokemonEsDeTipo (Poke Planta _ ) Planta = True 
-pokemonEsDeTipo        _           _    = False
+pokemonEsDeTipo p t = elTipoEsIgualA (tipoDe p) t 
+
+elTipoEsIgualA :: TipoDePokemon -> TipoDePokemon -> Bool 
+elTipoEsIgualA Fuego  Fuego  = True 
+elTipoEsIgualA Agua   Agua   = True 
+elTipoEsIgualA Planta Planta = True 
+elTipoEsIgualA _      _      = False
 
 cantidadDePokemonDe :: TipoDePokemon -> Entrenador -> Int 
 cantidadDePokemonDe t (E _ p1 p2 ) = (unoSiCeroSino(pokemonEsDeTipo p1 t )) + (unoSiCeroSino(pokemonEsDeTipo p2 t ))
@@ -269,17 +275,20 @@ estaVacia _  = False
 -- 3 
 
 elPrimero :: [a] -> a 
+-- Precond: La lista no puede ser vacía 
 elPrimero (x:_) = x
 elPrimero _ = error "La lista esta vacia"
 
 -- 4 
 
 sinElPrimero :: [a] -> [a]
+-- Precond: La lista no puede ser vacía 
 sinElPrimero (_ : xs) = xs 
 sinElPrimero _ = error "La lista esta vacia"
 
 -- 5
 
 splitHead :: [a] -> (a, [a])
+-- Precond: La lista no puede ser vacía 
 splitHead (x : xs) = (x, xs)
 splitHead _ = error "La lista esta vacia"
