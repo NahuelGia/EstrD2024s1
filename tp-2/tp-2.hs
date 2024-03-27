@@ -285,6 +285,7 @@ rol3 = Management SemiSenior proyecto4
 rol4 = Management SemiSenior proyecto4
 
 empresa1 = ConsEmpresa [rol1, rol2, rol3, rol4]
+empresa2 = ConsEmpresa []
 
 -- a
 
