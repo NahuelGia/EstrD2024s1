@@ -1,3 +1,8 @@
+
+singularSi :: a -> Bool -> [a]
+singularSi e True  = [e]
+singularSi _ False = []
+
 {- EJERCICIO 1 -}
 
 -- 1
@@ -40,33 +45,24 @@ aplanar (x:xs) = x ++ (aplanar xs)
 
 pertence :: Eq a => a -> [a] -> Bool 
 pertence e []     = False  
-pertence e (x:xs) = if (e == x)
-                      then True 
-                    else pertence e xs
+pertence e (x:xs) = (e == x) || pertence e xs
 
 -- 8 
 
 apariciones :: Eq a => a -> [a] -> Int 
 apariciones _ []     =  0 
-apariciones e (x:xs) = if(e == x)
-                        then 1 + (apariciones e xs)
-                       else apariciones e xs
-
+apariciones e (x:xs) = unoSi (e == x) + apariciones e xs 
 -- 9 
 
 losMenoresA :: Int -> [Int] -> [Int]
 losMenoresA _ []     = []
-losMenoresA n (x:xs) = if (x<n)
-                        then x : losMenoresA n xs 
-                       else losMenoresA n xs  
+losMenoresA n (x:xs) = singularSi x (x<n) ++ losMenoresA n xs 
 
 -- 10 
 
 lasDeLongitudMayorA :: Int -> [[a]] -> [[a]]
 lasDeLongitudMayorA _ []     = []
-lasDeLongitudMayorA n (x:xs) = if((longitud x) > n)
-                                then x : lasDeLongitudMayorA n xs  
-                               else lasDeLongitudMayorA n xs 
+lasDeLongitudMayorA n (x:xs) = singularSi x ((longitud x) > n) ++ lasDeLongitudMayorA n xs 
 
 -- 11 
 
@@ -91,18 +87,14 @@ reversa (x:xs) = reversa xs ++ [x]
 zipMaximos :: [Int] -> [Int] -> [Int]
 zipMaximos []      ys     = ys 
 zipMaximos xs      []     = xs 
-zipMaximos (x:xs) (y:ys) = if (x > y)
-                            then x : zipMaximos xs ys  
-                           else  y : zipMaximos xs ys  
+zipMaximos (x:xs) (y:ys) = (max x y) : zipMaximos xs ys  
 
 -- 15
 
 elMinimo :: Ord a => [a] -> a 
 -- Precond: La lista no puede ser vacia 
 elMinimo [x]    = x 
-elMinimo (x:xs) = if (x < (elMinimo xs))
-                    then x
-                  else elMinimo xs   
+elMinimo (x:xs) = min x (elMinimo xs)
 
 {- EJERCICIO 2 -}
 
@@ -158,9 +150,7 @@ listaPersonas = [hector,pedro,pepe]
 
 mayoresA :: Int -> [Persona] -> [Persona]
 mayoresA n []     = []
-mayoresA n (p:ps) = if  (edad p) > n 
-                      then p : mayoresA n ps 
-                    else mayoresA n ps 
+mayoresA n (p:ps) = singularSi p ((edad p) > n ) ++ mayoresA n ps
 
 -- b
 
@@ -205,19 +195,25 @@ cantPokemon e = longitud (listaPokemonDe e)
 
 -- b 
 
-unoSiCeroSino :: Bool -> Int 
-unoSiCeroSino True  = 1
-unoSiCeroSino False = 0 
+unoSi :: Bool -> Int 
+unoSi True  = 1
+unoSi False = 0 
 
 pokemonEsDeTipo :: Pokemon -> TipoDePokemon -> Bool 
-pokemonEsDeTipo (ConsPokemon Fuego  _ ) Fuego  = True 
-pokemonEsDeTipo (ConsPokemon Agua   _ ) Agua   = True 
-pokemonEsDeTipo (ConsPokemon Planta _ ) Planta = True 
-pokemonEsDeTipo        _           _           = False
+pokemonEsDeTipo p t = elTipoEsIgualA (tipoDe p) t 
+
+elTipoEsIgualA :: TipoDePokemon -> TipoDePokemon -> Bool 
+elTipoEsIgualA Fuego  Fuego  = True 
+elTipoEsIgualA Agua   Agua   = True 
+elTipoEsIgualA Planta Planta = True 
+elTipoEsIgualA _      _      = False
+
+tipoDe :: Pokemon -> TipoDePokemon
+tipoDe (ConsPokemon t _) = t 
 
 cantPokemonsDeTipoEn :: TipoDePokemon -> [Pokemon] -> Int 
 cantPokemonsDeTipoEn _ []     = 0
-cantPokemonsDeTipoEn t (p:ps) = (unoSiCeroSino (pokemonEsDeTipo p t)) + (cantPokemonsDeTipoEn t ps)
+cantPokemonsDeTipoEn t (p:ps) = (unoSi (pokemonEsDeTipo p t)) + (cantPokemonsDeTipoEn t ps)
 
 cantPokemonDe :: TipoDePokemon -> Entrenador -> Int 
 cantPokemonDe t e = cantPokemonsDeTipoEn t (listaPokemonDe e)
@@ -232,7 +228,7 @@ cantPokesDeTipoQueLeGananATodos :: TipoDePokemon -> [Pokemon] -> [Pokemon] -> In
 cantPokesDeTipoQueLeGananATodos _  []           pks2 = 0
 cantPokesDeTipoQueLeGananATodos t  (pk1 : pks1) pks2 = if  pokemonEsDeTipo pk1 t
 
-                                                          then unoSiCeroSino (venceATodos pk1 pks2)
+                                                          then unoSi (venceATodos pk1 pks2)
                                                                 + cantPokesDeTipoQueLeGananATodos t pks1 pks2
 
                                                         else cantPokesDeTipoQueLeGananATodos t pks1 pks2
@@ -242,7 +238,7 @@ tipo (ConsPokemon t _ ) = t
 
 
 venceATodos :: Pokemon -> [Pokemon] -> Bool
-venceATodos p1  []          = True
+venceATodos p1   []          = True
 venceATodos pk1  (pk2: pks2) = (superaA pk1 pk2) && venceATodos pk1 pks2
 
 tipoSuperaA :: TipoDePokemon -> TipoDePokemon -> Bool 
@@ -316,7 +312,7 @@ esDevSeniorConProyecto _                     _  = False
 
 cantDevSeniorConProyecto :: [Rol] -> [Proyecto] -> Int 
 cantDevSeniorConProyecto []     _  = 0
-cantDevSeniorConProyecto (r:rs) ps = (unoSiCeroSino (esDevSeniorConProyecto r ps)) + (cantDevSeniorConProyecto rs ps)
+cantDevSeniorConProyecto (r:rs) ps = (unoSi (esDevSeniorConProyecto r ps)) + (cantDevSeniorConProyecto rs ps)
 
 -- c
 
@@ -325,20 +321,22 @@ cantQueTrabajanEn pr (ConsEmpresa rs) = cantRolesConProyecto rs pr
 
 cantRolesConProyecto :: [Rol] -> [Proyecto] -> Int 
 cantRolesConProyecto []     _  = 0
-cantRolesConProyecto (r:rs) ps = unoSiCeroSino (pertence (proyectoDelRol r) ps) + cantRolesConProyecto rs ps 
+cantRolesConProyecto (r:rs) ps = unoSi (pertence (proyectoDelRol r) ps) + cantRolesConProyecto rs ps 
 
 -- d 
 
-asignadosPorProyecto :: Empresa -> [(Proyecto,Int)]
-asignadosPorProyecto e = cantRolesPorProyecto (listaRoles e) (proyectos e)
+asignadosPorProyecto :: Empresa -> [(Proyecto, Int)]
+asignadosPorProyecto (ConsEmpresa rs) = cantRolesPorProyecto rs
 
-listaRoles :: Empresa -> [Rol]
-listaRoles (ConsEmpresa rs) = rs 
+cantRolesPorProyecto :: [Rol]  -> [(Proyecto, Int)]
+cantRolesPorProyecto []     = []
+cantRolesPorProyecto (r:rs) = contarProyectoEn (proyectoDelRol r) (cantRolesPorProyecto rs)
 
-cantRolesPorProyecto :: [Rol] -> [Proyecto] -> [(Proyecto, Int)]
-cantRolesPorProyecto rs []     = []
-cantRolesPorProyecto rs (p:ps) = (p, rolesAsignadosEn rs p ) : cantRolesPorProyecto rs ps
+contarProyectoEn :: Proyecto -> [(Proyecto, Int)] -> [(Proyecto, Int)]
+contarProyectoEn p []     = [(p, 1)]
+contarProyectoEn p (z:zs) = if p == (fst z)
+                              then (sumarUno z) : zs 
+                            else z : contarProyectoEn p zs  
 
-rolesAsignadosEn :: [Rol] -> Proyecto -> Int 
-rolesAsignadosEn []     p = 0
-rolesAsignadosEn (r:rs) p = unoSiCeroSino ( (proyectoDelRol r) == p ) + rolesAsignadosEn rs p
+sumarUno :: (Proyecto, Int) -> (Proyecto, Int)
+sumarUno (p, n) = (p, n+1)
