@@ -76,7 +76,7 @@ esTesoro _      = False
 pasosHastaTesoro :: Camino -> Int
 -- Precond: Hay al menos un tesoro 
 pasosHastaTesoro (Cofre os ca) = if tieneTesoro os 
-                                    then 0 -- Puede existir la posibilidad de que hayan mas tesoros en el camino
+                                 then 0 -- Puede existir la posibilidad de que hayan mas tesoros en el camino
                                  else 1 + pasosHastaTesoro ca
 pasosHastaTesoro (Nada ca)     = 1 + pasosHastaTesoro ca  
 
@@ -114,8 +114,109 @@ cantTesorosEntre n1 n2 ca  = cantTesorosEntre (n1-1) (n2-1) (caminoSiguiente ca)
 
 {- EJERCICIO 2 -}
 
+
 -- 2.1
 
-data Tree a = EmptyT | NodeT a (Tree a) (Tree a) 
+data Tree a = EmptyT | NodeT a (Tree a) (Tree a)
+    deriving Show 
+
+arbol1 :: Tree Int 
+arbol1  =  NodeT 1
+        (NodeT 2
+            (NodeT 4 EmptyT EmptyT)
+            (NodeT 5 EmptyT EmptyT)
+        )
+        (NodeT 3
+            (NodeT 6 EmptyT EmptyT)
+            (NodeT 7 EmptyT EmptyT)
+        )
+
 
 -- 1 
+
+sumarT :: Tree Int -> Int
+sumarT EmptyT        =  0 
+sumarT (NodeT n x y) =  n + (sumarT x) + (sumarT y)
+
+-- 2
+
+sizeT :: Tree a -> Int 
+sizeT EmptyT        = 0
+sizeT (NodeT _ x y) = 1 + (sizeT x) + (sizeT y)
+
+-- 3 
+
+mapDobleT :: Tree Int -> Tree Int
+mapDobleT EmptyT        = EmptyT
+mapDobleT (NodeT n x y) = (NodeT (n*2) (mapDobleT x) (mapDobleT y))
+
+-- 4 
+
+perteneceT :: Eq a => a -> Tree a -> Bool
+perteneceT _ EmptyT           = False 
+perteneceT e1 (NodeT e2 x y ) = (e1 == e2) || (perteneceT e1 x) || (perteneceT e1 y)
+
+-- 5 
+
+aparicionesT :: Eq a => a -> Tree a -> Int
+aparicionesT _ EmptyT           = 0 
+aparicionesT e1 (NodeT e2 x y ) = unoSi (e1 == e2) + (aparicionesT e1 x) + (aparicionesT e1 y)
+
+-- 6 
+
+leaves :: Tree a -> [a]
+leaves EmptyT                  = []
+leaves (NodeT e EmptyT EmptyT) = [e] 
+leaves (NodeT e x y)           = (leaves x) ++ (leaves y)
+
+-- 7 
+
+heightT :: Tree a -> Int 
+heightT EmptyT                  = 0 
+heightT (NodeT a EmptyT EmptyT) = 0
+heightT (NodeT _ x y)           = 1 + max (heightT x) (heightT y)
+
+
+-- 8 
+
+mirrorT :: Tree a -> Tree a
+mirrorT EmptyT        = EmptyT
+mirrorT (NodeT e x y) = (NodeT e (mirrorT y) (mirrorT x) )
+
+-- 9 
+
+toList :: Tree a -> [a]
+toList EmptyT        =  []
+toList (NodeT e x y) = (toList x) ++ e : (toList y)
+
+-- 10 
+
+levelN :: Int -> Tree a -> [a]
+levelN _ EmptyT         = []
+levelN 0 (NodeT e x y)  = [e]
+levelN n (NodeT e x y)  = (levelN (n-1) x)  ++ (levelN (n-1) y)             
+
+-- 11
+
+listPerLevel :: Tree a -> [[a]]
+listPerLevel EmptyT        = []
+listPerLevel (NodeT e x y) = [[e]] ++ agruparPorNivel (listPerLevel x) (listPerLevel y)
+
+agruparPorNivel :: [[a]] -> [[a]] -> [[a]]
+agruparPorNivel [] []         = []
+agruparPorNivel xs []         = xs
+agruparPorNivel [] ys         = ys  
+agruparPorNivel (x:xs) (y:ys) = [x ++ y] ++ (agruparPorNivel xs ys)
+
+-- 12
+
+ramaMasLarga :: Tree a -> [a]
+ramaMasLarga EmptyT        = []
+ramaMasLarga (NodeT e x y) = toList(laRamaMasLarga x y)
+
+laRamaMasLarga :: Tree a -> Tree a -> Tree a 
+laRamaMasLarga t1 t2 = if heightT t1 > heightT t2
+                       then t1
+                       else t2
+
+-- 13 
