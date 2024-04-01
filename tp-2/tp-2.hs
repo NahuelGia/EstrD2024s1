@@ -43,9 +43,9 @@ aplanar (x:xs) = x ++ (aplanar xs)
 
 -- 7
 
-pertence :: Eq a => a -> [a] -> Bool 
-pertence e []     = False  
-pertence e (x:xs) = (e == x) || pertence e xs
+pertenece :: Eq a => a -> [a] -> Bool 
+pertenece e []     = False  
+pertenece e (x:xs) = (e == x) || pertenece e xs
 
 -- 8 
 
@@ -220,8 +220,8 @@ cantPokemonDe t e = cantPokemonsDeTipoEn t (listaPokemonDe e)
 
 -- c 
 
-cuantosDeTipoDe_LeGananATodosLosDe :: TipoDePokemon -> Entrenador -> Entrenador -> Int
-cuantosDeTipoDe_LeGananATodosLosDe t (ConsEntrenador _ pks1) (ConsEntrenador _ pks2) = cantPokesDeTipoQueLeGananATodos t pks1 pks2
+cuantosDeTipo_De_LeGananATodosLosDe_  :: TipoDePokemon -> Entrenador -> Entrenador -> Int
+cuantosDeTipo_De_LeGananATodosLosDe_  t (ConsEntrenador _ pks1) (ConsEntrenador _ pks2) = cantPokesDeTipoQueLeGananATodos t pks1 pks2
 
 
 cantPokesDeTipoQueLeGananATodos :: TipoDePokemon -> [Pokemon] -> [Pokemon] -> Int 
@@ -294,7 +294,7 @@ proyectos (ConsEmpresa rs) = proyectosEnRoles rs
 
 proyectosEnRoles :: [Rol] -> [Proyecto]
 proyectosEnRoles []     = []
-proyectosEnRoles (r:rs) = if pertence (proyectoDelRol r) (proyectosEnRoles rs)
+proyectosEnRoles (r:rs) = if pertenece (proyectoDelRol r) (proyectosEnRoles rs)
                             then proyectosEnRoles rs
                           else (proyectoDelRol r) : proyectosEnRoles rs
 
@@ -308,7 +308,7 @@ losDevSenior :: Empresa -> [Proyecto] -> Int
 losDevSenior (ConsEmpresa rs) ps = cantDevSeniorConProyecto rs ps
 
 esDevSeniorConProyecto :: Rol -> [Proyecto] -> Bool 
-esDevSeniorConProyecto (Developer Senior p ) ps = (pertence p ps)
+esDevSeniorConProyecto (Developer Senior p ) ps = (pertenece p ps)
 esDevSeniorConProyecto _                     _  = False
 
 cantDevSeniorConProyecto :: [Rol] -> [Proyecto] -> Int 
@@ -322,7 +322,7 @@ cantQueTrabajanEn pr (ConsEmpresa rs) = cantRolesConProyecto rs pr
 
 cantRolesConProyecto :: [Rol] -> [Proyecto] -> Int 
 cantRolesConProyecto []     _  = 0
-cantRolesConProyecto (r:rs) ps = unoSi (pertence (proyectoDelRol r) ps) + cantRolesConProyecto rs ps 
+cantRolesConProyecto (r:rs) ps = unoSi (pertenece (proyectoDelRol r) ps) + cantRolesConProyecto rs ps 
 
 -- d 
 
