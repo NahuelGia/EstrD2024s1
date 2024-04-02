@@ -220,3 +220,45 @@ laRamaMasLarga t1 t2 = if heightT t1 > heightT t2
                        else t2
 
 -- 13 
+
+consACada :: a -> [[a]] -> [[a]]
+consACada e []       = []
+consACada e (xs:xss) = (e:xs) : consACada e xss 
+
+todosLosCaminos :: Tree a -> [[a]]
+todosLosCaminos EmptyT        = [] 
+todosLosCaminos (NodeT e x y) = [e] : consACada e (todosLosCaminos x)
+                             ++ consACada e (todosLosCaminos y)
+
+-- 2 
+
+data ExpA = Valor Int
+            | Sum ExpA ExpA
+            | Prod ExpA ExpA
+            | Neg ExpA
+    deriving Show
+
+expresion1 :: ExpA
+expresion1 = Prod (Sum (Valor 2) (Valor 3)) (Neg (Valor 5))
+
+-- 1 
+
+eval :: ExpA -> Int 
+eval (Valor n)       = n 
+eval (Sum  exA exB)  = (eval exA) + (eval exB)
+eval (Prod exA exB)  = (eval exA) * (eval exB)
+eval (Neg  ex)       = - (eval ex)  
+
+-- 2 
+
+simplificar :: ExpA -> ExpA
+simplificar (Sum (Valor 0) x)  = x 
+simplificar (Sum x (Valor 0))  = x
+simplificar (Prod (Valor 0) x) = Valor 0 
+simplificar (Prod x (Valor 0)) = Valor 0
+simplificar (Prod (Valor 1) x) = x
+simplificar (Prod x (Valor 1)) = x
+simplificar (Neg (Neg x) )     = x
+simplificar x                  = x
+
+
