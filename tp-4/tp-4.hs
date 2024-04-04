@@ -166,4 +166,122 @@ longitudDe (Bifurcacion _ mi md) = 1 + max (longitudDe mi) (longitudDe md)
 
 -- 5 
 
+tesorosPorNivel :: Mapa -> [[Objeto]]
+tesorosPorNivel (Fin c)               = [tesorosEn c]
+tesorosPorNivel (Bifurcacion c mi md) = tesorosEn c : agruparPorNivel (tesorosPorNivel mi) (tesorosPorNivel md)
 
+agruparPorNivel :: [[a]] -> [[a]] -> [[a]]
+agruparPorNivel [] []         = []
+agruparPorNivel xs []         = xs
+agruparPorNivel [] ys         = ys  
+agruparPorNivel (x:xs) (y:ys) = (x ++ y) : (agruparPorNivel xs ys)
+
+tesorosEn :: Cofre -> [Objeto]
+tesorosEn (Cofre [])     = []
+tesorosEn (Cofre (o:os)) = singularSi o (esTesoro o)  ++ tesorosEn (Cofre os)
+
+-- 6 
+
+todosLosCaminos :: Mapa -> [[Dir]]
+todosLosCaminos (Fin _)               = [[]]
+todosLosCaminos (Bifurcacion _ mi md) = consACada Izq (todosLosCaminos mi) 
+                                     ++ consACada Der (todosLosCaminos md)
+
+consACada :: a -> [[a]] -> [[a]]
+consACada e []       = []
+consACada e (xs:xss) = (e:xs) : consACada e xss 
+
+{- EJERCICIO 3 -}
+
+-- Ejemplo de componentes
+componentesEjemplo :: [Componente]
+componentesEjemplo = [LanzaTorpedos, Motor 5, Almacen [Comida, Oxigeno, Torpedo]]
+
+-- Ejemplo de barriles en un almacén
+barrilesAlmacen :: [Barril]
+barrilesAlmacen = [Comida, Comida, Combustible, Oxigeno]
+
+-- Ejemplo de un sector con componentes y tripulantes
+sectorEjemplo :: Sector
+sectorEjemplo = S "SalaDeControl" componentesEjemplo ["Tripulante1", "Tripulante2"]
+
+-- Ejemplo de un árbol de sectores
+arbolSectores :: Tree Sector
+arbolSectores =
+    NodeT sectorEjemplo
+           (NodeT (S "SalaDeMaquinas" [Motor 3] ["Ingeniero"]) EmptyT EmptyT)
+           (NodeT (S "SalaDeCarga" [Almacen barrilesAlmacen] []) EmptyT EmptyT)
+
+-- Ejemplo de una nave que contiene un árbol de sectores
+naveEjemplo :: Nave
+naveEjemplo = N arbolSectores
+
+data Componente = LanzaTorpedos | Motor Int | Almacen [Barril]
+        
+data Barril = Comida | Oxigeno | Torpedo | Combustible
+    deriving Show
+data Sector = S SectorId [Componente] [Tripulante]
+    
+type SectorId = String
+    
+type Tripulante = String
+   
+data Tree a = EmptyT | NodeT a (Tree a) (Tree a)
+   
+data Nave = N (Tree Sector)
+   
+
+-- 1 
+
+sectores :: Nave -> [SectorId]
+sectores (N t)      = idSectoresEnTree t  
+
+idSectoresEnTree :: Tree Sector -> [SectorId]
+idSectoresEnTree EmptyT          = []
+idSectoresEnTree (NodeT s t1 t2) = idSector s : idSectoresEnTree t1 ++ idSectoresEnTree t2
+
+idSector :: Sector -> SectorId
+idSector (S id _ _ ) = id
+
+-- 2 
+
+poderDePropulsion :: Nave -> Int 
+poderDePropulsion (N t) = poderDePropulsionEnTree t 
+
+poderDePropulsionEnTree :: Tree Sector -> Int 
+poderDePropulsionEnTree EmptyT          = 0
+poderDePropulsionEnTree (NodeT s t1 t2) = poderDePropulsionDeComponentes (componentes s) 
+                                        + poderDePropulsionEnTree t1 
+                                        + poderDePropulsionEnTree t2 
+
+componentes :: Sector -> [Componente]
+componentes (S _ cs _) = cs
+
+poderDePropulsionDeComponentes :: [Componente] -> Int 
+poderDePropulsionDeComponentes []     = 0
+poderDePropulsionDeComponentes (c:cs) = poderDePropulsionSiEsMotor c 
+                                      + poderDePropulsionDeComponentes cs
+
+poderDePropulsionSiEsMotor :: Componente -> Int 
+poderDePropulsionSiEsMotor (Motor _ ) = 1 
+poderDePropulsionSiEsMotor _          = 0 
+
+
+-- 3 
+
+barriles :: Nave -> [Barril]
+barriles (N t) = barrilesEnTree t 
+
+barrilesEnTree :: Tree Sector -> [Barril]
+barrilesEnTree EmptyT          = []
+barrilesEnTree (NodeT s t1 t2) = barrilesEnLista (componentes s) 
+                              ++ barrilesEnTree t1 
+                              ++ barrilesEnTree t2 
+
+barrilesEnLista :: [Componente] -> [Barril]
+barrilesEnLista []     = []
+barrilesEnLista (c:cs) = barrilesSiEsAlmacen c ++ barrilesEnLista cs 
+
+barrilesSiEsAlmacen :: Componente -> [Barril] 
+barrilesSiEsAlmacen (Almacen bs) = bs 
+barrilesSiEsAlmacen _            = []
