@@ -52,6 +52,7 @@ pertenece e (x:xs) = (e == x) || pertenece e xs
 apariciones :: Eq a => a -> [a] -> Int 
 apariciones _ []     =  0 
 apariciones e (x:xs) = unoSi (e == x) + apariciones e xs 
+
 -- 9 
 
 losMenoresA :: Int -> [Int] -> [Int]
@@ -85,8 +86,8 @@ reversa (x:xs) = reversa xs ++ [x]
 -- 14 
 
 zipMaximos :: [Int] -> [Int] -> [Int]
-zipMaximos []      ys     = ys 
-zipMaximos xs      []     = xs 
+zipMaximos []      ys    = ys 
+zipMaximos xs      []    = xs 
 zipMaximos (x:xs) (y:ys) = (max x y) : zipMaximos xs ys  
 
 -- 15
@@ -108,8 +109,9 @@ factorial n = n * factorial (n-1)
 -- 2
 
 cuentaRegresiva :: Int -> [Int]
-cuentaRegresiva 0 = []
-cuentaRegresiva n = n : cuentaRegresiva (n-1) 
+cuentaRegresiva n = if n < 1
+                    then []
+                    else n : cuentaRegresiva (n-1) 
 
 -- 3 
 
