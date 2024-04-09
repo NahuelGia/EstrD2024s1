@@ -193,6 +193,9 @@ consACada e (xs:xss) = (e:xs) : consACada e xss
 
 {- EJERCICIO 3 -}
 
+idCarga :: SectorId
+idCarga = "SalaDeCarga"
+
 -- Ejemplo de componentes
 componentesEjemplo :: [Componente]
 componentesEjemplo = [LanzaTorpedos, Motor 5, Almacen [Comida, Oxigeno, Torpedo]]
@@ -209,27 +212,28 @@ sectorEjemplo = S "SalaDeControl" componentesEjemplo ["Tripulante1", "Tripulante
 arbolSectores :: Tree Sector
 arbolSectores =
     NodeT sectorEjemplo
-           (NodeT (S "SalaDeMaquinas" [Motor 3] ["Ingeniero"]) EmptyT EmptyT)
-           (NodeT (S "SalaDeCarga" [Almacen barrilesAlmacen] []) EmptyT EmptyT)
+           (NodeT (S "SalaDeMaquinas" [Motor 3] ["Ingeniero", "Tripulante1"]) EmptyT EmptyT)
+           (NodeT (S "SalaDeCarga" [Almacen barrilesAlmacen] ["Ingeniero", "Carlos"]) EmptyT EmptyT)
 
 -- Ejemplo de una nave que contiene un árbol de sectores
 naveEjemplo :: Nave
 naveEjemplo = N arbolSectores
 
 data Componente = LanzaTorpedos | Motor Int | Almacen [Barril]
-        
+    deriving Show    
 data Barril = Comida | Oxigeno | Torpedo | Combustible
     deriving Show
 data Sector = S SectorId [Componente] [Tripulante]
-    
+    deriving Show
+
 type SectorId = String
-    
+
 type Tripulante = String
    
 data Tree a = EmptyT | NodeT a (Tree a) (Tree a)
-   
+   deriving Show
 data Nave = N (Tree Sector)
-   
+    deriving Show
 
 -- 1 
 
@@ -285,3 +289,207 @@ barrilesEnLista (c:cs) = barrilesSiEsAlmacen c ++ barrilesEnLista cs
 barrilesSiEsAlmacen :: Componente -> [Barril] 
 barrilesSiEsAlmacen (Almacen bs) = bs 
 barrilesSiEsAlmacen _            = []
+
+-- 4 
+
+agregarASector :: [Componente] -> SectorId -> Nave -> Nave
+agregarASector cs id (N t) = (N (agregarASectorEnTree cs id t) )
+
+agregarASectorEnTree :: [Componente] -> SectorId -> Tree Sector -> Tree Sector
+agregarASectorEnTree _  _  EmptyT          = EmptyT
+agregarASectorEnTree cs id (NodeT s t1 t2) = if sectorTieneId s id
+                                             then (NodeT (agregarComponentes s cs) t1 t2)
+                                             else (NodeT s (agregarASectorEnTree cs id t1)
+                                                           (agregarASectorEnTree cs id t2))
+
+sectorTieneId :: Sector -> SectorId -> Bool 
+sectorTieneId (S id1 _ _ ) id2 = id1 == id2
+
+agregarComponentes :: Sector -> [Componente] -> Sector 
+agregarComponentes (S id cs1 ts) cs2 = (S id (cs1++cs2) ts)
+
+-- 5  Preguntar
+
+asignarTripulanteA :: Tripulante -> [SectorId] -> Nave -> Nave 
+-- Precond: Todos los id de la lista existen en la nave 
+asignarTripulanteA trip ids (N tree) = (N (asignarTripulanteAEnTree trip ids tree))
+
+asignarTripulanteAEnTree :: Tripulante -> [SectorId] -> Tree Sector -> Tree Sector 
+asignarTripulanteAEnTree trip ids EmptyT          = EmptyT
+asignarTripulanteAEnTree trip ids (NodeT s t1 t2) = if sectorSeEncuentraEnLista s ids 
+                                                    then (NodeT (asignarTriupalenteASector s trip) 
+                                                                (asignarTripulanteAEnTree trip ids t1)
+                                                                (asignarTripulanteAEnTree trip ids t2))
+                                                    else (NodeT s
+                                                                (asignarTripulanteAEnTree trip ids t1)
+                                                                (asignarTripulanteAEnTree trip ids t2) )
+
+asignarTriupalenteASector :: Sector -> Tripulante -> Sector 
+asignarTriupalenteASector (S id cs ts1) ts2 = (S id cs (ts2 : ts1 ))
+
+sectorSeEncuentraEnLista :: Sector -> [SectorId] -> Bool 
+sectorSeEncuentraEnLista s []       = False
+sectorSeEncuentraEnLista s (id:ids) = (sectorTieneId s id) || (sectorSeEncuentraEnLista s ids )
+
+-- 6
+
+sectoresAsignados :: Tripulante -> Nave -> [SectorId]
+sectoresAsignados  trip (N tree) = sectoresAsignadosEnTree trip tree 
+
+sectoresAsignadosEnTree :: Tripulante -> Tree Sector -> [SectorId]
+sectoresAsignadosEnTree _    EmptyT          = []
+sectoresAsignadosEnTree trip (NodeT s t1 t2) = singularSi (idSector s) (seEncuentraAsignado trip s)
+                                             ++ sectoresAsignadosEnTree trip t1 
+                                             ++ sectoresAsignadosEnTree trip t2
+
+seEncuentraAsignado :: Tripulante -> Sector -> Bool  
+seEncuentraAsignado t (S _ _ ts ) = pertenece t ts 
+    
+pertenece :: Eq a => a -> [a] -> Bool 
+pertenece e []     = False  
+pertenece e (x:xs) = (e == x) || pertenece e xs
+
+-- 7 
+
+tripulantes :: Nave -> [Tripulante]
+tripulantes (N t) = tripulantesEnTree t 
+
+tripulantesEnTree :: Tree Sector -> [Tripulante]
+tripulantesEnTree EmptyT          = []
+tripulantesEnTree (NodeT s t1 t2) = juntarSinRepetir (tripulantesDe s) (
+                                    juntarSinRepetir (tripulantesEnTree t1) 
+                                                     (tripulantesEnTree t2))
+
+tripulantesDe :: Sector -> [Tripulante]
+tripulantesDe (S _ _ ts) = ts 
+
+juntarSinRepetir :: Eq a => [a] -> [a] -> [a]
+juntarSinRepetir [] ys     = ys
+juntarSinRepetir (x:xs) ys = singularSi x (not (pertenece x ys)) ++ juntarSinRepetir xs ys 
+
+{- EJERCICIO 4 -}
+
+type Presa = String -- nombre de presa
+type Territorio = String -- nombre de territorio
+type Nombre = String -- nombre de lobo
+data Lobo = Cazador Nombre [Presa] Lobo Lobo Lobo
+          | Explorador Nombre [Territorio] Lobo Lobo
+          | Cria Nombre
+data Manada = M Lobo
+
+-- 1
+
+manada1 :: Manada 
+manada1 = (M (Cazador "Cazador" ["presa"] 
+             (Explorador "Explorador1" ["territorio1"] (Cria "cria2") (Cria "cria3") ) 
+             (Explorador "Explorador2" ["territorio2"] (Cria "cria4") (Cria "cria5") )
+             (Cria "cria1")))
+
+-- 2 
+
+buenaCaza :: Manada -> Bool
+buenaCaza (M l) = nroTotalPresas l > nroHijos l 
+
+nroHijos :: Lobo -> Int 
+nroHijos (Cria _)               = 1 
+nroHijos (Explorador _ _ l1 l2) = (nroHijos l1) + (nroHijos l2)
+nroHijos (Cazador _ _ l1 l2 l3) = (nroHijos l1) + (nroHijos l2) + (nroHijos l3)
+
+nroTotalPresas :: Lobo -> Int 
+nroTotalPresas (Cria _)                = 0 
+nroTotalPresas (Explorador _ _ l1 l2)  = (nroTotalPresas l1) + (nroTotalPresas l2)
+nroTotalPresas (Cazador _ pr l1 l2 l3) = (length pr) + (nroTotalPresas l1) + (nroTotalPresas l2) + (nroTotalPresas l3)
+
+-- 3 
+
+elAlfa :: Manada -> (Nombre, Int)
+elAlfa (M l) = elAlfaEn l 
+
+elAlfaEn :: Lobo -> (Nombre, Int)
+elAlfaEn (Cria n)                 = (n,0)
+elAlfaEn (Explorador _ _ l1 l2)   = elZipConMasPresasEntre (elAlfaEn l1) (elAlfaEn l2)         
+elAlfaEn (Cazador n pr l1 l2 l3 ) = elZipConMasPresasEntre (n, length pr)( 
+                                    elZipConMasPresasEntre (elAlfaEn l1)(
+                                    elZipConMasPresasEntre (elAlfaEn l2)  (elAlfaEn l3)) )    
+
+elZipConMasPresasEntre :: (Nombre, Int) -> (Nombre, Int) -> (Nombre, Int)
+elZipConMasPresasEntre z1 z2 = if (snd z1 > snd z2)
+                                  then z1 
+                                  else z2 
+
+-- 4 
+
+losQueExploraron :: Territorio -> Manada -> [Nombre]
+losQueExploraron t (M l) = losQueExploraronEn t l 
+
+losQueExploraronEn :: Territorio -> Lobo -> [Nombre]
+losQueExploraronEn t (Cria n)                = []
+losQueExploraronEn t (Explorador n ts l1 l2) = singularSi n (pertenece t ts)
+                                            ++ losQueExploraronEn t l1 
+                                            ++ losQueExploraronEn t l2
+losQueExploraronEn t (Cazador _ _ l1 l2 l3 ) = losQueExploraronEn t l1 
+                                            ++ losQueExploraronEn t l2 
+                                            ++ losQueExploraronEn t l3
+
+-- 5
+
+exploradoresPorTerritorio :: Manada -> [(Territorio, [Nombre])]
+exploradoresPorTerritorio (M l) = exploradoresPorTerritorioEn l 
+
+exploradoresPorTerritorioEn :: Lobo -> [(Territorio, [Nombre])]
+exploradoresPorTerritorioEn (Cria n)                = []
+exploradoresPorTerritorioEn (Explorador n ts l1 l2) = sumarTerritoriosDeALista n ts 
+                                                      ( juntarListaTuplasPorTerritorio 
+                                                        (exploradoresPorTerritorioEn l1)
+                                                        (exploradoresPorTerritorioEn l2) )
+exploradoresPorTerritorioEn (Cazador _ _ l1 l2 l3 ) = juntarListaTuplasPorTerritorio (exploradoresPorTerritorioEn l1) (
+                                                      juntarListaTuplasPorTerritorio (exploradoresPorTerritorioEn l2)
+                                                                                     (exploradoresPorTerritorioEn l3) )
+
+sumarTerritoriosDeALista :: Nombre -> [Territorio] -> [(Territorio, [Nombre])] -> [(Territorio, [Nombre])]
+sumarTerritoriosDeALista n []     zs = zs  
+sumarTerritoriosDeALista n (t:ts) zs = sumarNombreYTerritorio n t zs  
+                                    ++ sumarTerritoriosDeALista n ts zs 
+
+sumarNombreYTerritorio :: Nombre -> Territorio -> [(Territorio, [Nombre])] -> [(Territorio, [Nombre])]
+sumarNombreYTerritorio n t []     = (t,[n])
+sumarNombreYTerritorio n t (z:zs) = let territorio = fst z
+                                    in
+                                    if t == territorio
+                                    then (territorio, n : snd z ) ++ zs
+                                    else z : sumarNombreYTerritorio n t zs
+
+juntarListaTuplasPorTerritorio :: [(Territorio, [Nombre])] -> [(Territorio, [Nombre])] -> [(Territorio, [Nombre])]
+juntarListaTuplasPorTerritorio []     zs2 = zs2 
+juntarListaTuplasPorTerritorio (z:zs) zs2 = sumarTupla z zs2 ++ juntarListaTuplasPorTerritorio zs zs2
+
+sumarTupla :: (Territorio, [Nombre]) -> [(Territorio, [Nombre])] -> [(Territorio, [Nombre])]
+sumarTupla z []      = (fst z , snd z2)
+sumarTupla z (z2:zs) = let 
+                       territorio  = fst z
+                       in 
+                       if territorio == fst z2 
+                       then (territorio, (snd z) ++ (snd z2))
+                       else z2 : sumarTupla z zs 
+
+-- 6
+
+superioresDelCazador :: Nombre -> Manada -> [Nombre]
+superioresDelCazador n (M l) = superioresDelCazadorEn n l
+
+superioresDelCazadorEn :: Nombre -> Lobo -> [Nombre]
+superioresDelCazadorEn n (Cria _)
+superioresDelCazadorEn n (Explorador _ _ l1 l2)
+superioresDelCazadorEn n (Cazador n2 _ l1 l2 l3 ) = let superiores = superioresDelCazadorEn n l1 
+                                                                  ++ superioresDelCazadorEn n l2 
+                                                                  ++ superioresDelCazadorEn n l3 
+                                                    in
+                                                    singularSi n2 (seEncuentraEn n l1 l2 l3) ++ superiores
+
+seEncuentraEn :: Nombre -> Lobo -> Lobo -> Lobo -> Bool 
+seEncuentraEn  n l1 l2 l3 = loTiene n l1 || loTiene n l2 || loTiene n l3
+
+loTiene :: Nombre -> Lobo 
+loTiene n (Cria _)                 = False 
+loTiene n (Explorador _ _ l1 l2)   = loTiene n l1 || loTiene n l2
+loTiene n (Cazador n2 _ l1 l2 l3 ) = (n2 == n) || loTiene n l1 || loTiene n l2 || loTiene n l3
