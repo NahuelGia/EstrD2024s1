@@ -60,8 +60,9 @@ camino3 = Cofre [Cacharro, Cacharro] (Cofre [Tesoro] (Cofre [Cacharro] Fin))
 -- a 
 
 hayTesoro :: Camino -> Bool 
-hayTesoro (Cofre os c) = tieneTesoro os 
-hayTesoro _            = False 
+hayTesoro Fin            = False 
+hayTesoro (Cofre os ca)  = tieneTesoro os ||  hayTesoro ca
+hayTesoro (Nada ca)      = hayTesoro ca 
 
 tieneTesoro :: [Objeto] -> Bool 
 tieneTesoro []     = False 
@@ -86,7 +87,7 @@ pasosHastaTesoro (Nada ca)     = 1 + pasosHastaTesoro ca
 
 hayTesoroEn :: Int -> Camino -> Bool 
 hayTesoroEn _ Fin = False 
-hayTesoroEn 0 ca  = hayTesoro ca 
+hayTesoroEn 0 ca  = esCaminoConTesoro ca 
 hayTesoroEn n ca  = hayTesoroEn (n-1) (caminoSiguiente ca) 
 
 caminoSiguiente :: Camino -> Camino 
@@ -94,22 +95,31 @@ caminoSiguiente :: Camino -> Camino
 caminoSiguiente (Cofre os ca) = ca 
 caminoSiguiente (Nada ca)     = ca 
 
+esCaminoConTesoro :: Camino -> Bool 
+esCaminoConTesoro (Cofre os c) = tieneTesoro os 
+esCaminoConTesoro _            = False 
+
 -- d
 
 alMenosNTesoros :: Int -> Camino -> Bool 
-alMenosNTesoros _ Fin = False  
-alMenosNTesoros 0 _   = True 
-alMenosNTesoros n ca  = if hayTesoro ca 
-                         then alMenosNTesoros (n-1) (caminoSiguiente ca)
-                        else alMenosNTesoros n (caminoSiguiente ca) 
+alMenosNTesoros n ca = (cantTesorosEnCamino ca) >= n 
+
+cantTesorosEnCamino :: Camino -> Int 
+cantTesorosEnCamino Fin           = 0 
+cantTesorosEnCamino (Nada ca)     = cantTesorosEnCamino ca
+cantTesorosEnCamino (Cofre os ca) = (cantTesorosEnLista os) + cantTesorosEnCamino ca
+
+cantTesorosEnLista :: [Objeto] -> Int
+cantTesorosEnLista []       = 0
+cantTesorosEnLista (c : cs) = unoSi (esTesoro c) + cantTesorosEnLista cs
 
 -- e 
 
 cantTesorosEntre :: Int -> Int -> Camino -> Int
 -- Precond: El segundo numero es igual o mayor que el primero 
 cantTesorosEntre _  _  Fin = 0 
-cantTesorosEntre 0  0  ca  = unoSi (hayTesoro ca) 
-cantTesorosEntre 0  n2 ca  = unoSi (hayTesoro ca) + cantTesorosEntre 0 (n2-1) (caminoSiguiente ca)
+cantTesorosEntre 0  0  ca  = unoSi (esCaminoConTesoro ca) 
+cantTesorosEntre 0  n2 ca  = unoSi (esCaminoConTesoro ca) + cantTesorosEntre 0 (n2-1) (caminoSiguiente ca)
 cantTesorosEntre n1 n2 ca  = cantTesorosEntre (n1-1) (n2-1) (caminoSiguiente ca) 
 
 {- EJERCICIO 2 -}
@@ -173,7 +183,6 @@ leaves (NodeT e x y)           = (leaves x) ++ (leaves y)
 
 heightT :: Tree a -> Int 
 heightT EmptyT                  = 0 
-heightT (NodeT a EmptyT EmptyT) = 0
 heightT (NodeT _ x y)           = 1 + max (heightT x) (heightT y)
 
 
@@ -212,7 +221,7 @@ agruparPorNivel (x:xs) (y:ys) = [x ++ y] ++ (agruparPorNivel xs ys)
 
 ramaMasLarga :: Tree a -> [a]
 ramaMasLarga EmptyT        = []
-ramaMasLarga (NodeT e x y) = toList(laRamaMasLarga x y)
+ramaMasLarga (NodeT e x y) = e : toList(laRamaMasLarga x y)
 
 laRamaMasLarga :: Tree a -> Tree a -> Tree a 
 laRamaMasLarga t1 t2 = if heightT t1 > heightT t2
@@ -252,13 +261,16 @@ eval (Neg  ex)       = - (eval ex)
 -- 2 
 
 simplificar :: ExpA -> ExpA
-simplificar (Sum (Valor 0) x)  = x 
-simplificar (Sum x (Valor 0))  = x
+simplificar (Sum (Valor 0) x)  = simplificar x 
+simplificar (Sum x (Valor 0))  = simplificar x
 simplificar (Prod (Valor 0) x) = Valor 0 
 simplificar (Prod x (Valor 0)) = Valor 0
-simplificar (Prod (Valor 1) x) = x
-simplificar (Prod x (Valor 1)) = x
-simplificar (Neg (Neg x) )     = x
+simplificar (Prod (Valor 1) x) = simplificar x
+simplificar (Prod x (Valor 1)) = simplificar x
+simplificar (Neg (Neg x) )     = simplificar x
+simplificar (Sum e1 e2)        = Sum  (simplificar e1) (simplificar e2)
+simplificar (Prod e1 e2)       = Prod (simplificar e1) (simplificar e2)
+simplificar (Neg e)            = Neg  (simplificar e)
 simplificar x                  = x
 
 
