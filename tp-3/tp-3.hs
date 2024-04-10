@@ -118,9 +118,13 @@ cantTesorosEnLista (c : cs) = unoSi (esTesoro c) + cantTesorosEnLista cs
 cantTesorosEntre :: Int -> Int -> Camino -> Int
 -- Precond: El segundo numero es igual o mayor que el primero 
 cantTesorosEntre _  _  Fin = 0 
-cantTesorosEntre 0  0  ca  = unoSi (esCaminoConTesoro ca) 
-cantTesorosEntre 0  n2 ca  = unoSi (esCaminoConTesoro ca) + cantTesorosEntre 0 (n2-1) (caminoSiguiente ca)
+cantTesorosEntre 0  0  ca  = cantTesorosSiEsCofre ca 
+cantTesorosEntre 0  n2 ca  = cantTesorosSiEsCofre ca + cantTesorosEntre 0 (n2-1) (caminoSiguiente ca)
 cantTesorosEntre n1 n2 ca  = cantTesorosEntre (n1-1) (n2-1) (caminoSiguiente ca) 
+
+cantTesorosSiEsCofre :: Camino -> Int
+cantTesorosSiEsCofre (Cofre os ca) = cantTesorosEnLista os
+cantTesorosSiEsCofre _             = 0
 
 {- EJERCICIO 2 -}
 
