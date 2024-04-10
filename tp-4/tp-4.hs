@@ -139,7 +139,7 @@ irHacia (Bifurcacion _ _ md) Der = md
 irHacia (Bifurcacion _ mi _) Izq = mi
 
 
--- 3
+-- 3 Pendiente
 
 caminoAlTesoro :: Mapa -> [Dir]
 -- Precond: existe un tesoro y es unico
@@ -308,7 +308,7 @@ sectorTieneId (S id1 _ _ ) id2 = id1 == id2
 agregarComponentes :: Sector -> [Componente] -> Sector 
 agregarComponentes (S id cs1 ts) cs2 = (S id (cs1++cs2) ts)
 
--- 5  Preguntar
+-- 5  
 
 asignarTripulanteA :: Tripulante -> [SectorId] -> Nave -> Nave 
 -- Precond: Todos los id de la lista existen en la nave 
@@ -413,7 +413,7 @@ elAlfaEn (Cazador n pr l1 l2 l3 ) = elZipConMasPresasEntre (n, length pr)(
                                     elZipConMasPresasEntre (elAlfaEn l2)  (elAlfaEn l3)) )    
 
 elZipConMasPresasEntre :: (Nombre, Int) -> (Nombre, Int) -> (Nombre, Int)
-elZipConMasPresasEntre z1 z2 = if (snd z1 > snd z2)
+elZipConMasPresasEntre z1 z2 = if (snd z1 > snd z2) 
                                   then z1 
                                   else z2 
 
@@ -446,50 +446,40 @@ exploradoresPorTerritorioEn (Cazador _ _ l1 l2 l3 ) = juntarListaTuplasPorTerrit
                                                       juntarListaTuplasPorTerritorio (exploradoresPorTerritorioEn l2)
                                                                                      (exploradoresPorTerritorioEn l3) )
 
+juntarListaTuplasPorTerritorio :: [(Territorio, [Nombre])] -> [(Territorio, [Nombre])] -> [(Territorio, [Nombre])]
+juntarListaTuplasPorTerritorio []     ys = ys 
+juntarListaTuplasPorTerritorio (x:xs) ys = sumarTupla x ys ++ juntarListaTuplasPorTerritorio xs ys
+
+sumarTupla :: (Territorio, [Nombre]) -> [(Territorio, [Nombre])] -> [(Territorio, [Nombre])]
+sumarTupla x []     = [(fst x , snd x)]
+sumarTupla x (y:ys) = if (fst x) == (fst y)
+                   -- fst = Territorio | snd = nombres
+                      then (fst x, (snd x) ++ (snd y)) : ys
+                      else y : sumarTupla x ys 
+            
+
 sumarTerritoriosDeALista :: Nombre -> [Territorio] -> [(Territorio, [Nombre])] -> [(Territorio, [Nombre])]
 sumarTerritoriosDeALista n []     zs = zs  
 sumarTerritoriosDeALista n (t:ts) zs = sumarNombreYTerritorio n t zs  
                                     ++ sumarTerritoriosDeALista n ts zs 
 
 sumarNombreYTerritorio :: Nombre -> Territorio -> [(Territorio, [Nombre])] -> [(Territorio, [Nombre])]
-sumarNombreYTerritorio n t []     = (t,[n])
-sumarNombreYTerritorio n t (z:zs) = let territorio = fst z
-                                    in
-                                    if t == territorio
-                                    then (territorio, n : snd z ) ++ zs
+sumarNombreYTerritorio n t []     = [(t,[n])]
+sumarNombreYTerritorio n t (z:zs) = if t == (fst z)
+                                    then (fst z, n : snd z ) : zs
                                     else z : sumarNombreYTerritorio n t zs
 
-juntarListaTuplasPorTerritorio :: [(Territorio, [Nombre])] -> [(Territorio, [Nombre])] -> [(Territorio, [Nombre])]
-juntarListaTuplasPorTerritorio []     zs2 = zs2 
-juntarListaTuplasPorTerritorio (z:zs) zs2 = sumarTupla z zs2 ++ juntarListaTuplasPorTerritorio zs zs2
 
-sumarTupla :: (Territorio, [Nombre]) -> [(Territorio, [Nombre])] -> [(Territorio, [Nombre])]
-sumarTupla z []      = (fst z , snd z2)
-sumarTupla z (z2:zs) = let 
-                       territorio  = fst z
-                       in 
-                       if territorio == fst z2 
-                       then (territorio, (snd z) ++ (snd z2))
-                       else z2 : sumarTupla z zs 
+-- 6 Pendiente
 
--- 6
+-- superioresDelCazador :: Nombre -> Manada -> [Nombre]
+-- superioresDelCazador n (M l) = superioresDelCazadorEn n l
 
-superioresDelCazador :: Nombre -> Manada -> [Nombre]
-superioresDelCazador n (M l) = superioresDelCazadorEn n l
-
-superioresDelCazadorEn :: Nombre -> Lobo -> [Nombre]
-superioresDelCazadorEn n (Cria _)
-superioresDelCazadorEn n (Explorador _ _ l1 l2)
-superioresDelCazadorEn n (Cazador n2 _ l1 l2 l3 ) = let superiores = superioresDelCazadorEn n l1 
-                                                                  ++ superioresDelCazadorEn n l2 
-                                                                  ++ superioresDelCazadorEn n l3 
-                                                    in
-                                                    singularSi n2 (seEncuentraEn n l1 l2 l3) ++ superiores
-
-seEncuentraEn :: Nombre -> Lobo -> Lobo -> Lobo -> Bool 
-seEncuentraEn  n l1 l2 l3 = loTiene n l1 || loTiene n l2 || loTiene n l3
-
-loTiene :: Nombre -> Lobo 
-loTiene n (Cria _)                 = False 
-loTiene n (Explorador _ _ l1 l2)   = loTiene n l1 || loTiene n l2
-loTiene n (Cazador n2 _ l1 l2 l3 ) = (n2 == n) || loTiene n l1 || loTiene n l2 || loTiene n l3
+-- superioresDelCazadorEn :: Nombre -> Lobo -> Maybe [Nombre]
+-- superioresDelCazadorEn n (Cria _)                 = Nothing 
+-- superioresDelCazadorEn n (Explorador _ _ l1 l2)   = superioresDelCazadorEn n l1 ++ superioresDelCazadorEn n l2
+-- superioresDelCazadorEn n (Cazador n2 _ l1 l2 l3 ) = if (n == n2)
+--                                                     then Just []
+--                                                     else n2 : ( superioresDelCazadorEn n l1
+--                                                              ++ superioresDelCazadorEn n l2
+--                                                              ++ superioresDelCazadorEn n l3 ) 
