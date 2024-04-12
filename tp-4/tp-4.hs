@@ -472,14 +472,21 @@ sumarNombreYTerritorio n t (z:zs) = if t == (fst z)
 
 -- 6 Pendiente
 
--- superioresDelCazador :: Nombre -> Manada -> [Nombre]
--- superioresDelCazador n (M l) = superioresDelCazadorEn n l
+superioresDelCazador :: Nombre -> Manada -> [Nombre]
+superioresDelCazador n (M l) = superioresDelCazadorEn n l
 
--- superioresDelCazadorEn :: Nombre -> Lobo -> Maybe [Nombre]
--- superioresDelCazadorEn n (Cria _)                 = Nothing 
--- superioresDelCazadorEn n (Explorador _ _ l1 l2)   = superioresDelCazadorEn n l1 ++ superioresDelCazadorEn n l2
--- superioresDelCazadorEn n (Cazador n2 _ l1 l2 l3 ) = if (n == n2)
---                                                     then Just []
---                                                     else n2 : ( superioresDelCazadorEn n l1
---                                                              ++ superioresDelCazadorEn n l2
---                                                              ++ superioresDelCazadorEn n l3 ) 
+superioresDelCazadorEn :: Nombre -> Lobo -> Maybe [Nombre]
+superioresDelCazadorEn n (Cria _)                 = Nothing 
+superioresDelCazadorEn n (Explorador _ _ l1 l2)   = appenMaybe (superioresDelCazadorEn n l1)  (superioresDelCazadorEn n l2)
+superioresDelCazadorEn n (Cazador n2 _ l1 l2 l3 ) = if (n == n2)
+                                                    then Just []
+                                                    else Just (n2 ++ ( appenMaybe                                                    
+                                                                               (superioresDelCazadorEn n l1)
+                                                                               (appenMaybe (superioresDelCazadorEn n l2)
+                                                                                           (superioresDelCazadorEn n l3 ))))
+                    
+appenMaybe :: Maybe [a] -> Maybe [a] -> Maybe [a]
+appenMaybe Nothing Nothing     = Nothing
+appenMaybe Nothing (Just ys)   = Just ys 
+appenMaybe (Just xs) Nothing   = Just xs 
+appenMaybe (Just xs) (Just ys) = Just (xs ++ ys)
