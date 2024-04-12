@@ -141,7 +141,7 @@ arbol1  =  NodeT 1
             (NodeT 5 EmptyT EmptyT)
         )
         (NodeT 3
-            (NodeT 6 EmptyT EmptyT)
+            (NodeT 6 (NodeT 10 EmptyT EmptyT) EmptyT)
             (NodeT 7 EmptyT EmptyT)
         )
 
@@ -225,7 +225,7 @@ agruparPorNivel (x:xs) (y:ys) = [x ++ y] ++ (agruparPorNivel xs ys)
 
 ramaMasLarga :: Tree a -> [a]
 ramaMasLarga EmptyT        = []
-ramaMasLarga (NodeT e x y) = e : toList(laRamaMasLarga x y)
+ramaMasLarga (NodeT e x y) = e : ramaMasLarga (laRamaMasLarga x y)
 
 laRamaMasLarga :: Tree a -> Tree a -> Tree a 
 laRamaMasLarga t1 t2 = if heightT t1 > heightT t2
