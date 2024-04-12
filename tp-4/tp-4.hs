@@ -98,7 +98,7 @@ mapa2 =
 
 mapaLargo :: Mapa
 mapaLargo =
-    Bifurcacion (Cofre [Tesoro])          
+    Bifurcacion (Cofre [Chatarra])          
                 (Bifurcacion (Cofre [Chatarra])  
                              (Fin (Cofre [Tesoro])) 
                              (Fin (Cofre [Tesoro])))               
@@ -139,15 +139,20 @@ irHacia (Bifurcacion _ _ md) Der = md
 irHacia (Bifurcacion _ mi _) Izq = mi
 
 
--- 3 Pendiente
+-- 3 
 
 caminoAlTesoro :: Mapa -> [Dir]
+caminoAlTesoro m = fromJust (direccionesAlTesoro m)
+
+direccionesAlTesoro :: Mapa -> Maybe [Dir]
 -- Precond: existe un tesoro y es unico
-caminoAlTesoro (Fin _)               = []
-caminoAlTesoro (Bifurcacion _ mi md) = singularSi Izq (hayTesoro mi) 
-                                    ++ singularSi Der (hayTesoro md)
-                                    ++ caminoAlTesoro mi 
-                                    ++ caminoAlTesoro md
+direccionesAlTesoro (Fin cof)               = if (tieneTesoro cof)
+                                              then Just []
+                                              else Nothing 
+direccionesAlTesoro (Bifurcacion cof mi md) = if (tieneTesoro cof )
+                                              then Just []
+                                              else appendMaybes (consMaybe Izq (direccionesAlTesoro mi))
+                                                                (consMaybe Der (direccionesAlTesoro md)) 
 
 -- 4
 
@@ -470,23 +475,31 @@ sumarNombreYTerritorio n t (z:zs) = if t == (fst z)
                                     else z : sumarNombreYTerritorio n t zs
 
 
--- 6 Pendiente
+-- 6 
 
-superioresDelCazador :: Nombre -> Manada -> [Nombre]
-superioresDelCazador n (M l) = superioresDelCazadorEn n l
+superioresDelCazador :: Nombre -> Manada ->  [Nombre]
+superioresDelCazador n (M l) = fromJust (superioresDelCazadorEn n l)
 
 superioresDelCazadorEn :: Nombre -> Lobo -> Maybe [Nombre]
 superioresDelCazadorEn n (Cria _)                 = Nothing 
-superioresDelCazadorEn n (Explorador _ _ l1 l2)   = appenMaybe (superioresDelCazadorEn n l1)  (superioresDelCazadorEn n l2)
+superioresDelCazadorEn n (Explorador _ _ l1 l2)   = appendMaybes (superioresDelCazadorEn n l1) 
+                                                                 (superioresDelCazadorEn n l2)
 superioresDelCazadorEn n (Cazador n2 _ l1 l2 l3 ) = if (n == n2)
                                                     then Just []
-                                                    else Just (n2 ++ ( appenMaybe                                                    
-                                                                               (superioresDelCazadorEn n l1)
-                                                                               (appenMaybe (superioresDelCazadorEn n l2)
-                                                                                           (superioresDelCazadorEn n l3 ))))
-                    
-appenMaybe :: Maybe [a] -> Maybe [a] -> Maybe [a]
-appenMaybe Nothing Nothing     = Nothing
-appenMaybe Nothing (Just ys)   = Just ys 
-appenMaybe (Just xs) Nothing   = Just xs 
-appenMaybe (Just xs) (Just ys) = Just (xs ++ ys)
+                                                    else consMaybe n2 (appendMaybes (superioresDelCazadorEn n l1)
+                                                                                    (appendMaybes (superioresDelCazadorEn n l2)
+                                                                                                  (superioresDelCazadorEn n l3))) 
+
+appendMaybes :: Maybe [a] -> Maybe [a] -> Maybe [a]
+appendMaybes Nothing   Nothing = Nothing
+appendMaybes j1        Nothing =  j1 
+appendMaybes Nothing   j1      =  j1 
+appendMaybes (Just a) (Just b) = (Just (a++b)) 
+
+consMaybe :: a -> Maybe [a] -> Maybe [a]
+consMaybe _ Nothing   = Nothing 
+consMaybe a (Just as) = (Just (a:as))
+
+fromJust :: Maybe a -> a 
+fromJust Nothing  = error "No hay elemento"
+fromJust (Just a) = a
