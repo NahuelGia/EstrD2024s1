@@ -492,8 +492,8 @@ superioresDelCazadorEn n (Cazador n2 _ l1 l2 l3 ) = if (n == n2)
 
 appendMaybes :: Maybe [a] -> Maybe [a] -> Maybe [a]
 appendMaybes Nothing   Nothing = Nothing
-appendMaybes j1        Nothing =  j1 
-appendMaybes Nothing   j1      =  j1 
+appendMaybes j        Nothing  =  j 
+appendMaybes Nothing   j       =  j
 appendMaybes (Just a) (Just b) = (Just (a++b)) 
 
 consMaybe :: a -> Maybe [a] -> Maybe [a]
