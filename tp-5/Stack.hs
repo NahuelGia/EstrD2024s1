@@ -2,7 +2,12 @@ module Stack
  (Stack, emptyS, isEmptyS, push, top, pop, lenS)
 where
 
-data Stack a = Stack [a]
+data Stack a = Stack [a] Int 
+{-
+INV.REP.: En Stack xs n 
+* Cuando xs es vacia n es cero
+* Cuando xs no es vacia n es la cantidad de elementos de xs
+-}
 
 emptyS :: Stack a
 -- Crea una pila vacía.
@@ -18,16 +23,16 @@ lenS :: Stack a -> Int
 -- Da la cantidad de elementos en la pila.
 --Costo: constante.
 
-emptyS = (Stack [])
+emptyS = (Stack [] 0)
 
-isEmptyS (Stack xs) = null xs
+isEmptyS (Stack xs _) = null xs
 
-push a (Stack xs) = (Stack (a:xs))
+push a (Stack xs n) = (Stack (a:xs)(n+1))
 
-top (Stack xs) = head xs 
+top (Stack xs _) = head xs 
 
-pop (Stack xs) = (Stack (tail xs))
+pop (Stack xs n) =  (Stack (tail xs) (n-1))
 
-lenS (Stack xs) = length xs
+lenS (Stack xs n) = n
 
 

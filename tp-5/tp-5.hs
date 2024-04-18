@@ -8,26 +8,27 @@ import Stack
 {-
 head' :: [a] -> a
 head' (x:xs) = x
---  Constante 
+-- O(1)
 
 sumar :: Int -> Int
 sumar x = x + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1
--- Constante 
+-- O(1)
 
 factorial :: Int -> Int
 factorial 0 = 1
 factorial n = n * factorial (n-1)
--- Lineal 
+-- O(n) donde n es el numero sobre el que se hace recursion 
 
 longitud :: [a] -> Int
 longitud [] = 0
 longitud (x:xs) = 1 + longitud xs
--- Lineal 
+-- 0(n) donde n es la lista sobre la que se hace RE  
 
 factoriales :: [Int] -> [Int]
 factoriales [] = []
 factoriales (x:xs) = factorial x : factoriales xs
--- Cuadratico 
+-- 0(n*m) La n por la RE sobre la lista dada y la  
+-- m por factorial del numero   
 
 pertenece :: Eq a => a -> [a] -> Bool
 pertenece n [] = False
@@ -40,7 +41,9 @@ sinRepetidos (x:xs) =
  if pertenece x xs
  then sinRepetidos xs
  else x : sinRepetidos xs
--- Cuadratico 
+-- (n # Donde n es la lista ya que se hace RE sobre la misma 
+--  *
+--  n # Donde n es "pertenece" de una parte de la misma lista ) = (nxn) 
 
 -- equivalente a (++)
 append :: [a] -> [a] -> [a]
@@ -57,17 +60,21 @@ takeN :: Int -> [a] -> [a]
 takeN 0 xs = []
 takeN n [] = []
 takeN n (x:xs) = x : takeN (n-1) xs
--- Lineal 
+-- 0(n)
+-- donde n es el numero, ya que se hace recursion sobre el 
 
 dropN :: Int -> [a] -> [a]
 dropN 0 xs = xs
 dropN n [] = []
 dropN n (x:xs) = dropN (n-1) xs
--- Lineal 
+-- O(n)
+-- donde n es el numero, ya que se hace recursion sobre el   
 
 partir :: Int -> [a] -> ([a], [a])
 partir n xs = (takeN n xs, dropN n xs)
--- Lineal Duda 
+-- O(2n)
+-- donde n es el numero, dado que se realizan dos operaciones de dicho costo 
+-- de manera independiente  
 
 minimo :: Ord a => [a] -> a
 minimo [x] = x
@@ -80,14 +87,21 @@ sacar n (x:xs) =
  if n == x
  then xs
  else x : sacar n xs
--- Lineal 
+-- O(n)
+-- donde n es la cantidad de elementos de la lista 
 
 ordenar :: Ord a => [a] -> [a]
 ordenar [] = []
 orderar xs =
  let m = minimo xs
  in m : ordenar (sacar m xs)
--- Cuadratica 
+-- O(n # donde n es la longitud de la lista porque se realiza RE sobre la misma
+-- *
+-- (n  # por minimum sobre la lista 
+--  +
+-- n por sacar sobre la lista))
+-- O (n *(n+n)) = (n*(2n)) = (nxn) Al multiplicar por un numero no afecta el costo por se constante 
+
 -}
 {- EJERCICIO 2 -}
 
@@ -178,3 +192,8 @@ desapilar s = if isEmptyS s
               else (top s) : desapilar (pop s)
 
 -- c 
+
+insertarEnPos :: Int -> a -> Stack a -> Stack a
+-- Precond: El Stack tiene la una cantidad igual o mayor al numero dado 
+insertarEnPos 0 e s = push e s 
+insertarEnPos n e s = push ((top s) (insertarEnPos (n-1) e (pop s)))
