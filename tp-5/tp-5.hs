@@ -196,4 +196,4 @@ desapilar s = if isEmptyS s
 insertarEnPos :: Int -> a -> Stack a -> Stack a
 -- Precond: El Stack tiene la una cantidad igual o mayor al numero dado 
 insertarEnPos 0 e s = push e s 
-insertarEnPos n e s = push ((top s) (insertarEnPos (n-1) e (pop s)))
+insertarEnPos n e s = push (top s) (insertarEnPos (n-1) e (pop s))
