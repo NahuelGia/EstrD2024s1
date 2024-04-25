@@ -90,7 +90,7 @@ incrementarKeyEnMap k map =  let
                              then map 
                              else assocM k  ((fromJust valorK) + 1) map
 
--- 7  PREGUNTAR 
+-- 7  ARREGLAR usando keys  
 
 mergeMaps :: Eq k => Map k v -> Map k v -> Map k v
 -- Propósito: dado dos maps se agregan las claves y valores del primer map en el segundo. Si
@@ -135,4 +135,8 @@ multiconjunto2 :: MultiSet Char
 multiconjunto2 = addMS 'a' (addMS 'c' (addMS 'd' emptyMS))
 
 -- 2
+
+ocurrencias :: String -> MultiSet Char  
+ocurrencias []     = emptyM
+ocurrencias (c:cs) = addMS c (ocurrencia cs)
 

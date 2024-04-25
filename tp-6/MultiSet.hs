@@ -5,7 +5,7 @@ where
 import Map 
 
 data MultiSet a = MS (Map a Int)
--- Preguntar Inv.
+
 
 emptyMS :: MultiSet a
 -- Propósito: denota un multiconjunto vacío.
@@ -43,7 +43,7 @@ interseccionListaMap ((k,v):xs) map = case lookupM k map of
                                       Nothing -> interseccionListaMap xs map 
                                       Just v2  -> assocM k (v+v2) (interseccionListaMap xs map) 
 
-mergeMaps :: Eq k => Map k v -> Map k v -> Map k v
+mergeMaps :: Eq k => Map k v -> Map k v -> Map k v  -- En este caso no usar mapToList
 -- Propósito: dado dos maps se agregan las claves y valores del primer map en el segundo. Si
 -- una clave del primero existe en el segundo, es reemplazada por la del primero.
 mergeMaps map1 map2 = asociarEnMap (mapToList map1) map2 
