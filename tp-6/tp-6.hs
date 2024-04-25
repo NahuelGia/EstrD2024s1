@@ -1,5 +1,5 @@
 import PriorityQueue
-import Map 
+import Map2
 
 queue1 =  (insertPQ 10(insertPQ 5(insertPQ 6(insertPQ 2(insertPQ 1 emptyPQ)))))
 
@@ -18,6 +18,9 @@ pqToList pq = if isEmptyPQ pq
               else (findMinPQ pq) : (pqToList (deleteMinPQ pq))
 
 {- EJERCICIO 3 -}
+
+
+map1 = assocM "a" 10 (assocM "a" 1 (assocM "b" 2 (assocM "c" 3 emptyM)))
 
 -- 1 
 
