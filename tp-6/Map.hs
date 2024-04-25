@@ -18,13 +18,9 @@ keys :: Map k v -> [k]
 -- Propósito: devuelve las claves del map.
 
 emptyM = Map []
-
 assocM k v (Map xs) =  Map (asociarALista k v xs)  -- O(n) Donde n es por asociarALista sobre xs 
-
 lookupM k (Map xs) = valorEnLista k xs -- O(n) Donde n es por valoEnLista
-
 deleteM k (Map xs) =  Map (borrarEnLista k xs) -- O(n) Donde n es por borrarEnLista
-
 keys (Map xs) = keysEnLista xs  -- O(n) Donde n es por keysEnLista
 
 asociarALista :: Eq k => k -> v -> [(k,v)] -> [(k,v)] -- O(n) Donde n es la lista sobre la que se hace RE.

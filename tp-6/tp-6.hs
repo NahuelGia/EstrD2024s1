@@ -1,5 +1,6 @@
 import PriorityQueue
-import Map2
+import Map
+import MultiSet
 
 queue1 =  (insertPQ 10(insertPQ 5(insertPQ 6(insertPQ 2(insertPQ 1 emptyPQ)))))
 
@@ -64,20 +65,16 @@ fromJust :: Maybe a -> a -- O(1)
 fromJust Nothing  = error "No hay elemento"
 fromJust (Just a) = a
 
--- 5 PREGUNTAR  
+-- 5  
 
-agruparEq :: Eq k => [(k, v)] -> Map k [v]     -- 
-agruparEq xs = listToMap (agruparPorClave xs)
+agruparEq :: Eq k => [(k, v)] -> Map k [v]   
+agruparEq []         = emptyM
+agruparEq ((k,v):xs) = agruparPorClave k v (agruparEq xs) 
 
-agruparPorClave :: Eq k => [(k,v)] -> [(k,[v])] -- O(n^2) Donde una n es la lista sobre la que se hace RE 
-agruparPorClave []     = []                            -- y la otra n es por agruparPorClave
-agruparPorClave (x:xs) = insertarElemento x (agruparPorClave xs) 
-
-insertarElemento :: Eq k => (k,v) -> [(k,[v])] -> [(k,[v])] -- O(n) Donde n es la lista sobre la que se hace RE
-insertarElemento (k,v) []           = [(k,[v])]
-insertarElemento (k,v) ((k2,v2):xs) = if k == k2 
-                                      then (k, v : v2) : xs 
-                                      else (k2,v2) : (insertarElemento (k,v) xs)
+agruparPorClave :: Eq k => k -> v -> Map k [v] -> Map k [v]
+agruparPorClave k v map = case lookupM k map of 
+                          Nothing  -> assocM k [v] map 
+                          Just vs  -> assocM k (v:vs) map 
                                  
 -- 6 
 
@@ -103,4 +100,39 @@ mergeMaps map1 map2 = asociarEnMap (mapToList map1) map2
 asociarEnMap :: Eq k => [(k,v)] -> Map k v -> Map k v 
 asociarEnMap []         map = map 
 asociarEnMap ((k,v):xs) map = assocM k v (asociarEnMap xs map)
+
+{- EJERCICIO 5 -}
+
+-- a 
+
+indexar :: [a] -> Map Int a -- O(n^2)
+indexar xs = indexarAPartirDeIndice 0 xs 
+
+indexarAPartirDeIndice :: Int -> [a] ->  Map Int a -- O(n^2)
+indexarAPartirDeIndice _ []     = emptyM 
+indexarAPartirDeIndice n (x:xs) = assocM n x (indexarAPartirDeIndice (n+1) xs)
+
+-- b
+
+ocurrencias :: String -> Map Char Int 
+ocurrencias []     = emptyM
+ocurrencias (c:cs) = assocM c ( 1 + (apariciones c cs)) (ocurrencias cs)
+
+apariciones :: Eq a => a -> [a] -> Int 
+apariciones _ []     =  0 
+apariciones e (x:xs) = unoSi (e == x) + apariciones e xs 
+
+unoSi :: Bool -> Int 
+unoSi True  = 1
+unoSi False = 0 
+
+{- EJERCICIO 6 -}
+
+multiconjunto1 :: MultiSet Char
+multiconjunto1 = addMS 'a' (addMS 'b' (addMS 'a' emptyMS))
+
+multiconjunto2 :: MultiSet Char
+multiconjunto2 = addMS 'a' (addMS 'c' (addMS 'd' emptyMS))
+
+-- 2
 
