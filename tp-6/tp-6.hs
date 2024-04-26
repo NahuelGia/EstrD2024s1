@@ -90,16 +90,16 @@ incrementarKeyEnMap k map =  let
                              then map 
                              else assocM k  ((fromJust valorK) + 1) map
 
--- 7  ARREGLAR usando keys  
+-- 7   
 
 mergeMaps :: Eq k => Map k v -> Map k v -> Map k v
 -- Propósito: dado dos maps se agregan las claves y valores del primer map en el segundo. Si
 -- una clave del primero existe en el segundo, es reemplazada por la del primero.
-mergeMaps map1 map2 = asociarEnMap (mapToList map1) map2 
+mergeMaps map1 map2 = asociarEnMap (keys map1) map1 map2 
 
-asociarEnMap :: Eq k => [(k,v)] -> Map k v -> Map k v 
-asociarEnMap []         map = map 
-asociarEnMap ((k,v):xs) map = assocM k v (asociarEnMap xs map)
+asociarEnMap :: Eq k => [k] -> Map k v -> Map k v  -> Map k v 
+asociarEnMap []     map1 map2 = map2 
+asociarEnMap (k:ks) map1 map2 = assocM k (fromJust (lookupM k map1)) (asociarEnMap ks map1 map2)
 
 {- EJERCICIO 5 -}
 
@@ -136,7 +136,7 @@ multiconjunto2 = addMS 'a' (addMS 'c' (addMS 'd' emptyMS))
 
 -- 2
 
-ocurrencias :: String -> MultiSet Char  
-ocurrencias []     = emptyM
-ocurrencias (c:cs) = addMS c (ocurrencia cs)
+ocurrencias' :: String -> MultiSet Char  
+ocurrencias' []     = emptyMS
+ocurrencias' (c:cs) = addMS c (ocurrencias' cs)
 
