@@ -29,28 +29,12 @@ enqueue e (Q fs bs) = if null fs -- O(n)
 
 firstQ (Q fs _)   = head fs -- O(1)
 
-dequeue (Q fs bs) = if null (tail fs)
-                    then Q (reverse bs) []
-                    else Q (tail fs) bs
-
-                    case tail fs of 
+dequeue (Q fs bs) = case tail fs of 
                     [] -> Q (reverse bs) []
                     xs -> Q xs bs
-
+                    
 -- O (
 -- n # la cantidad de elementos de bs por reverse 
 -- )
 
 
-n # RE sobre la lista de keys 
-*
-(
-m # longitud de m1 por lookup
-+
-x # longitud de m2 por lookup
-+
-n # longitud de la lista de keys sobre la que se hace RE por assocM 
-)
-
-assoc k   v     recursion
---    key value map

@@ -1,7 +1,7 @@
 import Set 
 -- import Set2
 -- import Queue 
-import Queue2
+import Queue3
 import Stack
 
 {- EJERCICIO 1 -}
