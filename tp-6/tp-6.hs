@@ -112,7 +112,15 @@ indexarAPartirDeIndice :: Int -> [a] ->  Map Int a -- O(n^2)
 indexarAPartirDeIndice _ []     = emptyM 
 indexarAPartirDeIndice n (x:xs) = assocM n x (indexarAPartirDeIndice (n+1) xs)
 
+{-
+ Se puede realizar sin usar el indice y 
+ haciendo a indexar, una funcion por recursion 
+-}
+
 -- b
+
+-- Se puede resolver construyendo un map directamente
+-- sin una lista de por medio 
 
 ocurrencias :: String -> Map Char Int 
 ocurrencias []     = emptyM
