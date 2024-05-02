@@ -95,6 +95,25 @@ maxJust e (Just e2) = Just (max e e2)
 
 elMinimoMayorA :: Ord a => a -> Tree a -> Maybe a
 elMinimoMayorA e EmptyT           = Nothing 
-elMinimoMayorA e (NodeT e2 ti td) = if e < e2
-                                    then minJust e2 (elMaximoMenorA e ti)
-                                    else Nothing
+elMinimoMayorA e (NodeT e2 ti td) = if e >= e2  
+                                    then elMinimoMayorA e td  
+                                    else minJust e2 (elMinimoMayorA e ti) -- e < e2 
+
+minJust :: Ord a => a -> Maybe a -> Maybe a -- O(1)
+minJust e Nothing   = Just e 
+minJust e (Just e2) = Just (min e e2)
+
+-- 9 
+
+balanceado :: Tree a -> Bool -- O(n*n) Por RE sobre el Tree y por balanceado 
+balanceado EmptyT          = True 
+balanceado (NodeT _ ti td) = abs ((heightT ti) - (heightT td)) <= 1 
+                              && balanceado ti && balanceado td
+
+heightT :: Tree a -> Int -- O(n) por RE sobre el Tree 
+heightT EmptyT          = 0 
+heightT (NodeT _ ti td) = 1 + max (heightT ti) (heightT td) 
+
+{- EJERCICIO 4 -}
+
+
