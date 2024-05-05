@@ -88,7 +88,7 @@ elMaximoMenorA e (NodeT e2 ti td) = if e > e2
                                     else elMaximoMenorA e ti 
 
 maxJust :: Ord a => a -> Maybe a -> Maybe a 
-maxJust e Nothing   = Just e 
+maxJust e Nothing   = Just e  
 maxJust e (Just e2) = Just (max e e2)
 
 -- 8
@@ -116,4 +116,16 @@ heightT (NodeT _ ti td) = 1 + max (heightT ti) (heightT td)
 
 {- EJERCICIO 4 -}
 
+agregarEmpleado ids cuil (ConsE map1 map2) = case lookupM cuil map2 of 
+                                             Nothing -> agregarEmpleadoSiSectoresExisten ids cuil map1 map2  
+                                             Just _  -> ConsE map1 map2
 
+agregarEmpleadoSiSectoresExisten :: [SectorId] -> CUIL -> Map SectorId (Set Empleado) -> Map CUIL Empleado -> Empresa 
+agregarEmpleadoSiSectoresExisten []       cuil map1 map2 =
+agregarEmpleadoSiSectoresExisten (id:ids) cuil map1 map2 = let 
+                                                           empleado = consEmpleado cuil
+                                                           in 
+                                                           case lookupM id map1 of
+                                                           Nothing -> agregarEmpleadoSiSectoresExisten ids cuil map1 map2 
+                                                           Just s  -> ConsE (assocM id (addS empleado s) map1)
+                                                                            (assocM cuil (incorporarSector id empleado) map2)
