@@ -15,12 +15,14 @@ data Empresa = ConsE (Map SectorId (Set Empleado))
 {-
 INV.REP: En ConsE map1 map2 
 * Si el map2 esta vacío, ningún sector del map1 tiene empleados 
-* Un empleado NO tiene solo un CUIL 
+* Un empleado tiene solo un CUIL 
 * Todos los empleados del set de map1 corresponden a un empleado del map2. Es decir que no hay un empleado de map1 que no pertenezca a map2. 
 * Los sectores de los empleados de map1 y de map2 corresponden a ids de sectores del map1
 ! PREGUNTAR
 ? Como funcionan las instancias en funcional? Ejemplo: Si tengo un empleado en varios Sets por cada proyecto y yo le borro
 ? al empleado el proyecto, este se borra en los otros Sets también? 
+? Al implementar un dato abstracto en el parcial, tengo que escribir toda la estructura como se haría en 
+? una computadora? (Poner module, las funciones where, etc)
 -}
 
 

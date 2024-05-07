@@ -124,7 +124,7 @@ comenzarCon (id:ids) xs = agregarSector id (comenzarCon ids xs)
 
 comenzarConEmpleados :: [CUIL] -> Empresa 
 comenzarConEmpleados []     = consEmpresa
-comenzarConEmpleados (c:cs) = agregarEmpleado c (comenzarConEmpleados cs)
+comenzarConEmpleados (c:cs) = agregarEmpleado [] c (comenzarConEmpleados cs)
 
 -- b 
 
