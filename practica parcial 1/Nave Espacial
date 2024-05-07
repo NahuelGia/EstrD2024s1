@@ -106,11 +106,10 @@ asignarASector n id (N mapSS mapNT heapT) = let
 -- Esto es porque se hace RE sobre la cant de tripulantes del heap y
 -- por cada tripulante se llama a la función insertH que es O(log T) y deleteMaxH de O(log T)
 reemplazarTripulante :: Tripulante -> MaxHeap Tripulante -> MaxHeap Tripulante
-reemplazarTripulante t heap = if emptyH heap 
-                              then heap 
-                              else if maxH heap == t
-                                   then insertH t (deleteMaxH heap)
-                                   else insertH (maxH heap) (reemplazarTripulante t (deleteMaxH heap))
+-- Precondicion: El tripulante se encuentra dentro del heap
+reemplazarTripulante t heap = if maxH heap == t
+                              then insertH t (deleteMaxH heap)
+                              else insertH (maxH heap) (reemplazarTripulante t (deleteMaxH heap))
 
 
 fromJust :: Maybe a -> a 
