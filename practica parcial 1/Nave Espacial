@@ -90,6 +90,10 @@ agregarComponentes :: [Componente] -> Sector -> Sector
 agregarComponentes []     s = s
 agregarComponentes (c:cs) s = agregarC c (agregarComponentes cs s)
 
+-- f
+
+-- O (log T + log S + log S + log T + log S + log T + (T * log T) ) = (log T + log S + T log T)
+
 asignarASector :: Nombre -> SectorId -> Nave -> Nave
 -- Precond: El tripulante y el sector existen.
 asignarASector n id (N mapSS mapNT heapT) = let 
@@ -98,6 +102,9 @@ asignarASector n id (N mapSS mapNT heapT) = let
                                             in 
                                             (N (assocM id sector mapSS) (assocM n tripulante mapNT) (reemplazarTripulante tripulante heapT))
 
+-- O(T * (log T + log T ) ) = (T * log T)
+-- Esto es porque se hace RE sobre la cant de tripulantes del heap y
+-- por cada tripulante se llama a la función insertH que es O(log T) y deleteMaxH de O(log T)
 reemplazarTripulante :: Tripulante -> MaxHeap Tripulante -> MaxHeap Tripulante
 reemplazarTripulante t heap = if emptyH heap 
                               then heap 
