@@ -1,0 +1,63 @@
+module Nave 
+    (N, construir, ingresarT, sectoresAsignados, datosDeSector)
+where 
+
+data Nave = N (Map SectorId Sector) (Map Nombre Tripulante) (MaxHeap Tripulante)
+
+{-
+INV.REP: En N mapSS mapNT maxheapTS
+* Los tripulantes de maxheapTS corresponden a tripulantes de mapNT.
+* Los sectores de los triupalntes de mapNT corresponden a SectoresId de mapSS.
+* Los tripulantes asignados en los sectores de mapSS corresponden a tripulantes de mapSS.
+* No existe un tripulante que tenga asignado un sector el cual no tenga asignado al mismo tripulante ni viceversa.
+? Preguntar como redactar lo de arriba 
+* Si mapNT está vacío entonces maxHeapTS también lo está y los sectores de mapSS no tienen tripulantes asignados.
+* Si MaxHeap está vacío entonces mapNT también lo está.
+-}
+
+-- b
+
+-- ! El ejercicio dice que tiene que ser de O(S), pero el assocM es de O(log s), al menos que S * log S = S
+construir :: [SectorId] -> Nave
+construir ids = N (crearMapSectores ids) emptyM  emptyH
+
+-- O(S*log S)
+-- Donde S es la cantida de ids de sectores de la lista SectorId
+-- El costo es este debido a que por cada id de la lista se llama a la funcion 
+-- assocM la cual es de O(log S) ya que el contenido de este map es una parte de la lista de Sectores 
+crearMapSectores :: [SectorId] -> Map SectorId Sector  
+crearMapSectores []       = emptyM
+crearMapSectores (id:ids) = assocM id (crearS id) (crearMapSectores ids)
+
+-- c 
+-- O(log T + log T) = (2 log T) = (log T)
+-- El donde T es el nro de tripulantes de la nave.
+-- El costo es asi porque debido al que en la función se llama a:
+-- assocM que es de O(log T) y a insertH que también es de O(log T) .
+-- ? Si se asigna un nombre que ya existe? Se sobreescribiria el valor y se rompe el invariante, pero puede que el costo para comprobar sea mayor
+ingresarT :: Nombre -> Rango -> Nave -> Nave
+ingresarT n r (N mapSS mapNT heapT) = let 
+                                      tripulante = crearT n r 
+                                      in
+                                      N mapSS (assocM n tripulante mapNT) (insertH tripulante heapT) 
+                                    -- case lookupM n mapNT 
+                                    -- Nothing -> N mapSS (assocM n tripulante mapNT) (insertH tripulante heapT) 
+                                    -- Just _  -> N mapSS mapNT heapT 
+-- d 
+--  ! EL ejercicio dice O(log M)
+-- O(log T)
+-- Debido a que se llama a la funcion lookupM que es de O(log T) ya que el map cuenta con tripulantes dentro
+sectoresAsignados :: Nombre -> Nave -> Set SectorId
+-- Precond: Existe un tripulante con dicho nombre.
+sectoresAsignados n (N _ mapNT _ ) = case lookupM n mapNT of 
+                                     Nothing -> error "No existe un tripulante con ese nombre"
+                                     Just t  -> sectoresT t 
+
+-- e
+-- O(log S)
+-- Debido a que se llama a la funcion lookupM que es de O(log S) en este caso ya que el map tiene sectores dentro. 
+datosDeSector :: SectorId -> Nave -> (Set Nombre, [Componente])
+-- Precond: Existe un sector con dicho id.
+datosDeSector id (N mapSS _ _ ) = case lookupM id mapSS of 
+                                  Nothing -> error "No existe un sector con esa id"
+                                  Just s  -> (tripulantesS s, componentesS s)
