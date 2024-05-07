@@ -114,18 +114,46 @@ heightT :: Tree a -> Int -- O(n) por RE sobre el Tree
 heightT EmptyT          = 0 
 heightT (NodeT _ ti td) = 1 + max (heightT ti) (heightT td) 
 
-{- EJERCICIO 4 -}
+{- EJERCICIO 5 -}
 
-agregarEmpleado ids cuil (ConsE map1 map2) = case lookupM cuil map2 of 
-                                             Nothing -> agregarEmpleadoSiSectoresExisten ids cuil map1 map2  
-                                             Just _  -> ConsE map1 map2
+-- a
 
-agregarEmpleadoSiSectoresExisten :: [SectorId] -> CUIL -> Map SectorId (Set Empleado) -> Map CUIL Empleado -> Empresa 
-agregarEmpleadoSiSectoresExisten []       cuil map1 map2 =
-agregarEmpleadoSiSectoresExisten (id:ids) cuil map1 map2 = let 
-                                                           empleado = consEmpleado cuil
-                                                           in 
-                                                           case lookupM id map1 of
-                                                           Nothing -> agregarEmpleadoSiSectoresExisten ids cuil map1 map2 
-                                                           Just s  -> ConsE (assocM id (addS empleado s) map1)
-                                                                            (assocM cuil (incorporarSector id empleado) map2)
+comenzarCon :: [SectorId] -> [CUIL] -> Empresa
+comenzarCon []       xs = comenzarConEmpleados xs
+comenzarCon (id:ids) xs = agregarSector id (comenzarCon ids xs)  
+
+comenzarConEmpleados :: [CUIL] -> Empresa 
+comenzarConEmpleados []     = consEmpresa
+comenzarConEmpleados (c:cs) = agregarEmpleado c (comenzarConEmpleados cs)
+
+-- b 
+
+recorteDePersonal :: Empresa -> Empresa
+recorteDePersonal empresa = let 
+                            empleados    = todosLosCUIL empresa 
+                            nroEmpleados = length empleados
+                            in
+                            borrarEmpleados empresa ( take (round (nroEmpleados/2)) empleados )
+
+borrarEmpleados :: Empresa -> [CUIL] -> Empresa 
+borrarEmpleados e  []     = e
+borrarEmpleados e  (c:cs) = borrarEmpleado c (borrarEmpleados e cs )
+
+-- c 
+
+convertirEnComodin :: CUIL -> Empresa -> Empresa
+convertirEnComodin cuil empresa =  agregarASectores (todosLosSectores empresa) cuil empresa
+
+agregarASectores :: [SectorId] -> CUIL -> Empresa -> Empresa
+agregarASectores []     cuil empresa =  empresa
+agregarASectores (x:xs) cuil empresa =  agregarASector x cuil (agregarASectores xs cuil consEmpresa)
+
+-- d 
+
+esComodin :: CUIL -> Empresa -> Bool
+esComodin cuil empresa = seEncuentraEn (buscarPorCUIL cuil empresa) (todosLosSectores empresa) empresa
+
+seEncuentraEn :: Empleado -> [SectorId] -> Empresa
+seEncuentraEn empleado []     empresa = True 
+seEncuentraEn empleado (x:xs) empresa = elem empleado (empleadosDelSector x empresa) 
+                                        && seEncuentraEn empleado xs empresa

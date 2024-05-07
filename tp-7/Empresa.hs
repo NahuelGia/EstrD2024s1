@@ -14,9 +14,13 @@ data Empresa = ConsE (Map SectorId (Set Empleado))
                      (Map CUIL Empleado)
 {-
 INV.REP: En ConsE map1 map2 
+* Si el map2 esta vacío, ningún sector del map1 tiene empleados 
+* Un empleado NO tiene solo un CUIL 
 * Todos los empleados del set de map1 corresponden a un empleado del map2. Es decir que no hay un empleado de map1 que no pertenezca a map2. 
-* Los sectores de los empleados de map1 y de map2 corresponden a id de sectores del map1
+* Los sectores de los empleados de map1 y de map2 corresponden a ids de sectores del map1
 ! PREGUNTAR
+? Como funcionan las instancias en funcional? Ejemplo: Si tengo un empleado en varios Sets por cada proyecto y yo le borro
+? al empleado el proyecto, este se borra en los otros Sets también? 
 -}
 
 
@@ -106,7 +110,7 @@ agregarEmpleadoASectores []       e map = map
 agregarEmpleadoASectores (id:ids) e map = case lookupM id map of
                                           Just set -> assocM id (addS e set) (agregarEmpleadoASectores ids e map)
                                           Nothing  -> agregarEmpleadoASectores ids e map  -- *error "La id no corresponde a un sector existente"
-                                                    --! Si hago esto está mal porque ya incorporé los sectores al Empleado
+                                                    -- ! Si hago esto está mal porque ya incorporé los sectores al Empleado
 
 -- O(S * log N) 
 -- Donde S es el nro de ids de la lista sobre la que se hace RE y N es la cantidad de Sectores que 
@@ -119,7 +123,7 @@ incorporarSectoresAEmpleado (id:ids) e = incorporarSector id (incorporarSectores
 
 
 -- O (log E # Por lookupM sobre el nro de empleados en map2
---    + (3 log S + 2 log E ) # por costo de agregarASectorSiExiste ) --! Preguntar
+--    + (3 log S + 2 log E ) # por costo de agregarASectorSiExiste ) -- ! Preguntar
 agregarASector id cuil (ConsE map1 map2) = case lookupM cuil map2 of  -- Chequeo que el empleado exista    
                                            Nothing -> ConsE map1 map2 -- Si no existe no hago nada 
                                            Just e  -> agregarASectorSiExiste (ConsE map1 map2) -- Lo agrego al sector solo si existe
@@ -131,10 +135,10 @@ agregarASector id cuil (ConsE map1 map2) = case lookupM cuil map2 of  -- Chequeo
 --  + log S # Por incorporarSector sobre el nro de sectores del empleado que por Inv en el peor caso 
            -- es igual al nro de sectores del map1).
 agregarASectorSiExiste :: SectorId -> Empleado -> Map Sector (Set Empleado) -> Map CUIL Empleado -> Empresa 
-agregarASector id e map1 map2 = case lookupM id map1 of  -- Chequeo que el sector exista
-                                Nothing -> ConsE map1 map2  -- Si no existe no hago nada 
-                                Just s  -> ConsE (assocM id (addS e s) map1)
-                                                 (assocM cuil (incorporarSector id e) map2)
+agregarASectorSiExiste id e map1 map2 = case lookupM id map1 of  -- Chequeo que el sector exista
+                                             Nothing -> ConsE map1 map2  -- Si no existe no hago nada 
+                                             Just s  -> ConsE (assocM id (addS e s) map1)
+                                                              (assocM cuil (incorporarSector id e) map2)
 -- ! Calcular costo 
 borrarEmpleado cuil (ConsE map1 map2) = case lookupM cuil map2 of 
                                         Nothing -> ConsE map1 map2 
