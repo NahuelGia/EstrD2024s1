@@ -1,6 +1,8 @@
+#include <iostream>
 
+//* EJERCICIO 3
 
-// EJERCICIO 3
+using namespace std;
 
 typedef struct {
     int x;
@@ -49,10 +51,9 @@ Par divisionYResto(int n, int m){
     return newPar;
 }
 
-// EJERCICIO 4
+//* EJERCICIO 4
 
 // 1 
-
 //Propósito: imprime n veces un string s.
 
 void printNI(int n, char* s){
@@ -118,7 +119,8 @@ int mult(int n, int m){ //? Que pasa si hay números negativos
     {
         resultado += m;
     }
-    
+
+    return resultado;
 }
 
 int max(int n, int m){
@@ -144,12 +146,13 @@ int min(int n, int m){
 // Propósito: imprime los primeros n char del string s, separados por un salto de línea.
 // Precondición: el string tiene al menos n char.
 
-void primerosNI(int n, char* s){
+void primerosNI(int n, string s){
 
-   for ( char caracter : s ) //? Como puedo hacer un foreach y un salto de linea?
+   for (int i = 0; i < n ; i++)
    {
-     std::cout << caracter << std::endl;
+    std::cout << s[i] << std::endl;
    }
+   
 }
 
 // 6 
@@ -157,8 +160,126 @@ void primerosNI(int n, char* s){
 
 // Propósito: indica si un char c aparece en el string s.
 
-bool perteneceI(char c, char* s){
+bool perteneceI(char c, string s){
 
+   int i = 0;
+
+   while ( s[i] != c && s[i] != 0 )
+   {
+        i += 1;
+   }
+   return s[i] == c ;
+}
+
+// 7
+
+// Propósito: devuelve la cantidad de apariciones de un char c en el string s.
+
+int apariciones(char c, string s){
+
+   int apariciones    = 0;
+
+//   int indice = 0;
+
+//    while ( s[i] != c && s[i] != null )
+//    {
+//         indice += 1;
+//         apariciones += static_cast<int>(s[i] == c);
+//    }
+   
+   for (int i = 0; i <= s.size() ; i++)
+   {
+        apariciones += static_cast<int>(s[i] == c);
+   }
+   
+   return apariciones;
+
+}
+
+//* EJERCICIO 5 
+
+struct Fraccion {
+    int numerador;
+    int denominador;
+};
+
+typedef struct Fraccion Fraccion;
+
+// Propósito: construye una fraccion
+// Precondición: el denominador no es cero
+Fraccion consFraccion(int numerador, int denominador){
+    Fraccion newF;
+    newF.numerador   = numerador;
+    newF.denominador = denominador;
+
+    return newF;
+}
+
+// Propósito: devuelve el numerador
+int numerador(Fraccion f){
+    return f.numerador;
+}
+
+// Propósito: devuelve el denominador
+int denominador(Fraccion f){
+    return f.denominador;
+}
+
+// Propósito: devuelve el resultado de hacer la división
+float division(Fraccion f){
+    return f.numerador / f.denominador ;
+}
+
+
+// Precondición: Los números son mayores a cero
+int mcdEntre(int x, int y){
+
+    int aux;
+
+    if (x>y){
+        aux = x;
+    } else
+    {
+        aux = y;
+    }
     
+    while ( aux > 0 && ((x % aux) != 0 || (y % aux) != 0) ){
+        aux --;
+    }
 
+    return aux;
+}
+
+// Propósito: devuelve una fracción que resulta
+// de simplificar la dada por parámetro
+Fraccion simplificada(Fraccion p){
+    int mcd = mcdEntre(p.denominador, p.numerador);
+
+    Fraccion resultante;
+
+    resultante.denominador = p.denominador / mcd;
+
+    resultante.numerador = p.numerador / mcd;
+
+    return resultante;
+}
+
+// // Propósito: devuelve la primera componente
+// Fraccion sumF(Fraccion f1, Fraccion f2); //? No lo entiendo
+
+
+void imprimirF(Fraccion f){
+    int numerador = f.numerador;
+    int denominador = f.denominador;
+    std::cout << numerador << " / " << denominador << std::endl;
+}
+
+Fraccion fraccionEjemplo = consFraccion(4,2);
+
+int main(){
+    
+    //imprimirF(fraccionEjemplo);
+    std::cout << mcdEntre(-9,-8) << std::endl;
+
+    return 0;
 }
