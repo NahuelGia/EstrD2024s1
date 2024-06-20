@@ -4,10 +4,14 @@ NodoL* siguiente; // puntero al siguiente nodo
 };
 
 struct LinkedListSt {
-// INV.REP.: cantidad indica la cantidad de nodos que se pueden recorrer
+// INV.REP.:  - cantidad indica la cantidad de nodos que se pueden recorrer
 // desde primero por siguiente hasta alcanzar a NULL
+// - Si primero es NULL, entonces ultimo tambíen
+// - Si ultimo es NUll, entonces primero tambíen
+// - Si ultimo es != NULL, entonces last->siguiente = NULL
 int cantidad; // cantidad de elementos
 NodoL* primero; // puntero al primer nodo
+NodoL* ultimo; // puntero al ultimo nodo
 };
 
 // ? DUDA Esto tiene que estar acá o en el cpp?
@@ -48,3 +52,6 @@ bool atEnd(ListIterator ixs);
 void DisposeIterator(ListIterator ixs);
 // Libera la memoria ocupada por la lista.
 void DestroyL(LinkedList xs);
+// Agrega todos los elementos de la segunda lista al final de los de la primera.
+// La segunda lista se destruye
+void Append(LinkedList xs, LinkedList ys);

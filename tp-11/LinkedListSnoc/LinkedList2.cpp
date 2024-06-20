@@ -1,6 +1,6 @@
 #include <string>
 #include <iostream>
-#include "LinkedList.h"
+#include "LinkedList2.h"
 
 using namespace std;
 
@@ -8,6 +8,7 @@ LinkedList nil(){
     LinkedList newList = new LinkedListSt;
     newList->cantidad = 0;
     newList->primero = NULL;
+    newList->ultimo  = NULL;
 
     return newList;
 }
@@ -20,11 +21,17 @@ int head(LinkedList xs){
     return xs->primero->elem;
 }
 
-void Cons(int x, LinkedList xs){
+void Cons(int x, LinkedList xs){ 
     NodoL* nodo = new NodoL; 
     nodo->elem = x;
     nodo->siguiente = xs->primero;
     xs->primero = nodo;
+
+    if (xs->ultimo == NULL)
+    {
+        xs->ultimo = nodo;
+    }
+
     xs->cantidad++;
 }
 
@@ -34,6 +41,11 @@ void Tail(LinkedList xs){
         xs->primero = NodoAEliminar->siguiente;
         xs->cantidad--;
         delete NodoAEliminar;
+    }
+
+    if (xs->primero == NULL)
+    {
+        xs->ultimo == NULL;
     }
 }
 
@@ -49,20 +61,12 @@ void Snoc(int x, LinkedList xs){
     nuevo->elem = x;
     nuevo->siguiente = NULL;
 
-    if (xs->primero == nullptr){
+    if (xs->ultimo == NULL){
         xs->primero = nuevo;
-    } else
-    {
-       NodoL* actual = xs->primero;
-        // Sabemos que el primero no es NULL
-        while (actual->siguiente != nullptr)
-        {
-            actual = actual->siguiente;
-        } // Estamos en el ultimo Nodo
-        
-        actual->siguiente = nuevo;
+    } else {
+        xs->ultimo->siguiente = nuevo;
     }
-
+    xs->ultimo = nuevo;    
     xs->cantidad++;
 }
 
@@ -109,4 +113,16 @@ void DestroyL(LinkedList xs){
     delete xs;
 }
 
+// TODO hacer O(1)
+void Append(LinkedList xs, LinkedList ys){
 
+    NodoL* actual = ys->primero;
+
+    while (actual != NULL)
+    {
+        Snoc(actual->elem, xs);
+        actual = actual->siguiente;
+    }
+    
+    DestroyL(ys);
+}
