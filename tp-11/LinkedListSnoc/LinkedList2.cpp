@@ -113,16 +113,15 @@ void DestroyL(LinkedList xs){
     delete xs;
 }
 
-// TODO hacer O(1)
 void Append(LinkedList xs, LinkedList ys){
 
-    NodoL* actual = ys->primero;
-
-    while (actual != NULL)
-    {
-        Snoc(actual->elem, xs);
-        actual = actual->siguiente;
+    if (xs->ultimo == NULL){
+        xs->primero = ys->primero;
+        xs->ultimo = ys->primero;
+    } else {
+        xs->ultimo->siguiente = ys->primero;
     }
-    
+
+    xs->cantidad += ys->cantidad;
     DestroyL(ys);
 }
