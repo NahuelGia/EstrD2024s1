@@ -1,5 +1,6 @@
 #include <string>
 #include <iostream>
+#include "LinkedList.h"
 
 using namespace std;
 
@@ -31,7 +32,7 @@ void AddS(int x, Set s);
 void RemoveS(int x, Set s);
 // Devuelve la cantidad de elementos.
 int sizeS(Set s);
-// Devuelve una lista con los lementos del conjunto.
+// Devuelve una lista con los elementos del conjunto.
 LinkedList setToList(Set s);
 // Libera la memoria ocupada por el conjunto
 void DestroyS(Set s);
