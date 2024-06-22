@@ -123,5 +123,6 @@ void Append(LinkedList xs, LinkedList ys){
     }
 
     xs->cantidad += ys->cantidad;
-    DestroyL(ys);
+    // DestroyL(ys); //! No puedo borrar sus nodos, ya que se estos punteros ahora los tiene xs
+    delete ys;
 }
