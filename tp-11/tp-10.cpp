@@ -1,11 +1,11 @@
-// EJERCICIO 2 
-
+#include "Tree.h"
 #include <string>
 #include <iostream>
 #include "LinkedList.h"
 
 using namespace std;
 
+// EJERCICIO 2 
 // 1
 
 int sumatoria(LinkedList xs){
@@ -137,6 +137,53 @@ void Append(LinkedList xs, LinkedList ys){
    hacia el último nodo. Para el caso en que Snoc fuera O(1) el costo de append pasaría de ser
    O(n*m) a ser O(n) ya que por cada elemento de ys se llama a Snoc .
  */
+
+
+// EJERCICIO 7
+
+//1
+
+// O(n) donde n es la cantidad de elementos del árbol. Y también es n sobre la creación de stack frames.
+int sumarT(Tree t){
+    int valorActual = 0;
+
+    if (!isEmptyT(t))
+    {
+        valorActual += rootT(t);
+        valorActual += sumarT(left(t));
+        valorActual += sumarT(right(t));
+    }
+    return valorActual;
+}
+
+//2
+
+int sizeT(Tree t){
+    int elemVistos = 0;
+
+    if(!isEmptyT(t))
+    {
+        elemVistos ++;
+        elemVistos += sizeT(left(t));
+        elemVistos += sizeT(right(t));
+    }
+
+    return elemVistos;
+}
+
+//3
+
+bool perteneceT(int e, Tree t){ // TODO comprobar funcionamiento
+
+    if (!isEmpty(t) )
+    {
+        return rootT(t) == e || perteneceT(e, left(t)) || perteneceT(e, right(t));
+    } 
+    
+    return false;
+}
+
+//4
 
 
 int main()
