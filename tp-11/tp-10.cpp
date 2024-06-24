@@ -287,7 +287,7 @@ void agregarEnLevelNList(int n, ArrayList xs, Tree t){
         } else
         {
             agregarEnLevelNList(n-1, xs, right(t));
-            levagregarEnLevelNListelN(n-1, xs, left(t));
+            agregarEnLevelNList(n-1, xs, left(t));
         }
     }
 }
