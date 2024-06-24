@@ -272,33 +272,23 @@ ArrayList levelN(int n, Tree t){
 
     if (!isEmpty(t))
     {
-        if (n > 0)
-        {
-            levelN(n--, right(t))
-        } else
-        {
-            
-        }
+        agregarEnLevelNList(n, xs, t);
     }
     
     return list;
 }
 
 void agregarEnLevelNList(int n, ArrayList xs, Tree t){
-    if (!isEmpty(t))
+    if (!isEmptyT(t))
     {
-        if (n > 0)
-        {
-            levelN(n--, xs, right(t));
-            levelN(n--, xs, left(t));
-        } else if (n == 0)
+        if (n == 0)
         {
             Cons(rootT(t), xs)
         } else
         {
-            return;
+            agregarEnLevelNList(n-1, xs, right(t));
+            levagregarEnLevelNListelN(n-1, xs, left(t));
         }
-        
     }
 }
 
