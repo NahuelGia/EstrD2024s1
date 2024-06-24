@@ -58,7 +58,7 @@ void MergeQ(Queue q1, Queue q2){
     if (q1->ultimo == nullptr) // q1 está vacío
     {
         q1->primero = q2->primero;
-        q1->ultimo = q2->primero;
+        q1->ultimo  = q2->ultimo;
     } else {
         q1->ultimo->siguiente = q2->primero;
     }

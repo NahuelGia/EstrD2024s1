@@ -2,6 +2,7 @@
 #include <string>
 #include <iostream>
 #include "LinkedList.h"
+#include "ArrayList.h"
 
 using namespace std;
 
@@ -173,7 +174,7 @@ int sizeT(Tree t){
 
 //3
 
-bool perteneceT(int e, Tree t){ // TODO comprobar funcionamiento
+bool perteneceT(int e, Tree t){ 
 
     if (!isEmpty(t) )
     {
@@ -184,6 +185,124 @@ bool perteneceT(int e, Tree t){ // TODO comprobar funcionamiento
 }
 
 //4
+
+int aparicionesT(int e, Tree t){
+    
+    int count = 1;
+
+    if (isEmptyT(t) || rootT(t) != e)
+    {
+        count = 0;
+    }
+
+    return count + aparicionesT(e,left(t)) + aparicionesT(e,right(t))
+}
+
+//5
+
+int heightT(Tree t){
+
+    if (isEmptyT(t)){
+        return 0;
+    }
+
+    int leftHeightT = heightT(left(t));
+    int rightHeightT = heightT(right(t))
+
+    int result = leftHeightT > rightHeightT ? leftHeightT : rightHeightT;
+
+    return 1 + result;
+
+}
+
+// 6 
+
+ArrayList toList(Tree t){
+    ArrayList list = new ArrayList();
+
+    if (!isEmptyT(t))
+    {
+        meterEnLista(list, t);
+    }
+    
+    return list;
+}
+
+void meterEnLista(ArrayList xs, Tree t){
+
+    if (!isEmpty(t))
+    {  // Lo pongo en este orden porque lo primero que quiero ver es lo ultimo que agrego
+        meterEnLista(xs, right(t));
+        meterEnLista(xs, left(t));
+        add(rootT(t), xs);
+    }
+}
+
+// 7 
+
+ArrayList leaves(Tree t){
+    ArrayList list = new ArrayList();
+
+    if (!isEmptyT(t))
+    {
+        meterEnListaLeaves(list, t);
+    }
+    
+    return list;
+}
+
+void meterEnListaLeaves(ArrayList xs, Tree t){
+    
+    if (!isEmptyT(t))
+    {
+        if ((isEmptyT(right(t)) && isEmptyT(left(t))))
+        {
+            Cons(rootT(t),xs)
+        } else
+        {
+            meterEnListaLeaves(xs,left(t));
+            meterEnListaLeaves(xs,right(t));
+        }
+    }
+}
+
+// Precond: n es mayor a  0
+ArrayList levelN(int n, Tree t){
+    ArrayList list = new ArrayList();
+
+    if (!isEmpty(t))
+    {
+        if (n > 0)
+        {
+            levelN(n--, right(t))
+        } else
+        {
+            
+        }
+    }
+    
+    return list;
+}
+
+void agregarEnLevelNList(int n, ArrayList xs, Tree t){
+    if (!isEmpty(t))
+    {
+        if (n > 0)
+        {
+            levelN(n--, xs, right(t));
+            levelN(n--, xs, left(t));
+        } else if (n == 0)
+        {
+            Cons(rootT(t), xs)
+        } else
+        {
+            return;
+        }
+        
+    }
+}
+
+
 
 
 int main()
