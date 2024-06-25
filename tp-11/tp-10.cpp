@@ -292,6 +292,221 @@ void agregarEnLevelNList(int n, ArrayList xs, Tree t){
     }
 }
 
+// 8 
+
+// 1
+
+int sumarT(Tree t){
+    int result = 0;
+    Tlist faltanProcesar = emptyTL();
+    Tree actual;
+
+    if(!isEmptyT(t)){
+        Const(t, faltanProcesar);
+    }
+
+    while (!isEmptyTL(faltanProcesar))
+    {
+        actual = headTl(faltanProcesar);
+        tailTL(faltanProcesar);
+        result += rootT(t);
+        if (!isEmptyT(left(actual))) { SnocTL(left(actual), faltanProcesar) }
+        if (!isEmptyT(right(actual))) { SnocTL(right(actual), faltanProcesar) }
+    }
+    
+    LiberarTL(faltanProcesar);
+    return result;
+
+}
+
+// 2 
+
+int sizeT(Tree t){
+    int vistos = 0;
+    Tlist faltanProcesar = emptyTL();
+    Tree actual;
+
+    if(!isEmptyT(t)){
+        Const(t, faltanProcesar);
+    }
+
+    while (!isEmptyTL(faltanProcesar))
+    {
+        actual = headTL(faltanProcesar);
+        tailTL(faltanProcesar);
+        vistos++;
+        if (!isEmptyT(left(actual))) { SnocTL(left(actual), faltanProcesar) }
+        if (!isEmptyT(right(actual))) { SnocTL(right(actual), faltanProcesar) }
+    }
+    
+    LiberarTL(faltanProcesar);
+    return vistos;
+}
+
+// 3
+
+bool perteneceT(int e, Tree t){
+    Tlist faltanProcesar = emptyTL();
+    Tree actual;
+
+    if(!isEmptyT(t)){
+        Const(t, faltanProcesar);
+    }
+
+    while (!isEmptyTL(faltanProcesar))
+    {
+        actual = headTL(faltanProcesar);
+        tailTL(faltanProcesar);
+        if(rootT(actual) == e) {return true;}
+        if (!isEmptyT(left(actual))) { SnocTL(left(actual), faltanProcesar) }
+        if (!isEmptyT(right(actual))) { SnocTL(right(actual), faltanProcesar) }
+    }
+    
+    LiberarTL(faltanProcesar);
+    return false;
+}
+
+// 4
+
+int aparicionesT(int e, Tree t){
+    Tlist faltanProcesar = emptyTL();
+    Tree actual;
+    int vistos = 0;
+
+    if(!isEmptyT(t)){
+        Const(t, faltanProcesar);
+    }
+
+    while (!isEmptyTL(faltanProcesar))
+    {
+        actual = headTL(faltanProcesar);
+        tailTL(faltanProcesar);
+
+        vistos += rootT(actual) == e ? 1 : 0 ;
+
+        if (!isEmptyT(left(actual))) { SnocTL(left(actual), faltanProcesar) }
+        if (!isEmptyT(right(actual))) { SnocTL(right(actual), faltanProcesar) }
+    }
+    LiberarTL(faltanProcesar)
+    return vistos;
+}
+
+// 6
+
+ArrayList toList(Tree t){
+    Tlist faltanProcesar = emptyTL();
+    Tree actual;
+    ArrayList vistos = newArrayList();
+
+    if(!isEmptyT(t)){
+        Const(t, faltanProcesar);
+    }
+
+    while (!isEmptyTL(faltanProcesar))
+    {
+        actual = head(faltanProcesar);
+        tailTL(faltanProcesar);
+
+        Cons(rootT(actual), vistos);
+
+        if (!isEmptyT(left(actual))) { SnocTL(left(actual), faltanProcesar) }
+        if (!isEmptyT(right(actual))) { SnocTL(right(actual), faltanProcesar) }
+    }
+    
+    LiberarTL(faltanProcesar);
+    return vistos;
+}
+
+int heightT(Tree t){
+    Tlist faltanProcesar = emptyTL();
+    Tree actual;
+    int levelSize;
+    int altura = 0;
+
+    while (!isEmptyTL(faltanProcesar))
+    {   
+        levelSize = lengthTL(faltanProcesar);
+        altura++
+
+        for (int i = 0; i < levelSize; ++i)
+        {
+            actual = headTL(faltanProcesar);
+            tailTL(faltanProcesar);
+
+            if (!isEmptyT(left(actual))) { SnocTL(left(actual), faltanProcesar) }
+            if (!isEmptyT(right(actual))) { SnocTL(right(actual), faltanProcesar) }
+        }
+    } 
+
+    LiberarTL(faltanProcesar);
+    return altura;  
+}
+
+ArrayList leaves(Tree t){
+    Tlist faltanProcesar = emptyTL();
+    Tree actual;
+    int levelSize;
+    ArrayList procesados = newArrayList();
+
+    while (!isEmptyTL(faltanProcesar))
+    {
+        levelSize = lengthTL(faltanProcesar);
+
+        for (int i = 0; i < levelSize; i++)
+        {
+            actual = headTL(faltanProcesar);
+            tailTL(faltanProcesar);
+
+            if (isEmptyT(left(actual)) && isEmptyT(right(actual)))
+            {
+                Cons(rootT(actual), procesados);
+            }
+
+            if (!isEmptyT(left(actual))) { SnocTL(left(actual), faltanProcesar) }
+            if (!isEmptyT(right(actual))) { SnocTL(right(actual), faltanProcesar) }
+        }
+    }
+
+    LiberarTL(faltanProcesar);
+    return procesados;
+}
+
+
+// Precond n es mayor a cero
+ArrayList levelN(int n, Tree t){
+    Tlist faltanProcesar = emptyTL();
+    Tree actual;
+    int levelSize;
+    ArrayList procesados = newArrayList();
+    int nivel;
+
+    while (!emptyTL(faltanProcesar))
+    {
+        levelSize = lengthTL(faltanProcesar);
+        nivel++;
+
+        if (nivel == n)
+        {
+            
+        }
+        
+        for (int i = 0; i < levelSize; i++)
+        {
+            actual = headTL(faltanProcesar);
+            tailTL(faltanProcesar);
+
+            if (isEmptyT(left(actual)) && isEmptyT(right(actual)))
+            {
+                Cons(rootT(actual), procesados);
+            }
+
+            if (!isEmptyT(left(actual))) { SnocTL(left(actual), faltanProcesar) }
+            if (!isEmptyT(right(actual))) { SnocTL(right(actual), faltanProcesar) }
+        }
+
+    }
+
+}
 
 
 
